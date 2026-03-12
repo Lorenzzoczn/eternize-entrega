@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Rápido - Sistema Eternize</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .test-container {
+            background: white;
+            padding: 50px;
+            border-radius: 25px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .emoji {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .test-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 18px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #2980b9;
+            transform: translateY(-3px);
+        }
+
+        .btn-success {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+            transform: translateY(-3px);
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .info-box h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            padding: 8px 0;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .info-box li::before {
+            content: '✓ ';
+            color: #2ecc71;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #2ecc71;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .test-container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .emoji {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="emoji">✨</div>
+        <div class="status">Sistema Pronto!</div>
+        <h1>Teste o Sistema Eternize</h1>
+        <p>Escolha uma das opções abaixo para testar as funcionalidades implementadas</p>
+
+        <div class="test-buttons">
+            <a href="create.html" class="btn btn-primary">
+                📸 Criar Nova Página
+            </a>
+            <a href="index.html" class="btn btn-secondary">
+                🏠 Voltar ao Site Principal
+            </a>
+            <button class="btn btn-success" onclick="testarSistema()">
+                🔧 Testar Sistema (Console)
+            </button>
+        </div>
+
+        <div class="info-box">
+            <h3>✅ Funcionalidades Implementadas:</h3>
+            <ul>
+                <li>Upload múltiplo de fotos</li>
+                <li>Pré-visualização de imagens</li>
+                <li>Galeria com opção de remover</li>
+                <li>Armazenamento com IndexedDB</li>
+                <li>Geração de ID único</li>
+                <li>Criação de link compartilhável</li>
+                <li>Geração de QR Code</li>
+                <li>Download do QR Code</li>
+                <li>Página de visualização</li>
+                <li>100% offline (sem backend)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        async function testarSistema() {
+            console.log('🔧 Iniciando testes do sistema...\n');
+
+            // Teste 1: Verificar IndexedDB
+            console.log('1️⃣ Testando IndexedDB...');
+            try {
+                const dbTest = indexedDB.open('TesteEternize', 1);
+                dbTest.onsuccess = () => {
+                    console.log('✅ IndexedDB funcionando!');
+                    dbTest.result.close();
+                    indexedDB.deleteDatabase('TesteEternize');
+                };
+                dbTest.onerror = () => {
+                    console.error('❌ IndexedDB não disponível');
+                };
+            } catch (error) {
+                console.error('❌ Erro ao testar IndexedDB:', error);
+            }
+
+            // Teste 2: Verificar QRCode.js
+            console.log('\n2️⃣ Testando biblioteca QRCode...');
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+            script.onload = () => {
+                console.log('✅ QRCode.js carregado com sucesso!');
+                if (typeof QRCode !== 'undefined') {
+                    console.log('✅ QRCode disponível globalmente');
+                } else {
+                    console.error('❌ QRCode não está disponível');
+                }
+            };
+            script.onerror = () => {
+                console.error('❌ Erro ao carregar QRCode.js');
+            };
+            document.head.appendChild(script);
+
+            // Teste 3: Verificar arquivos
+            console.log('\n3️⃣ Verificando arquivos do sistema...');
+            const arquivos = [
+                'js/storage.js',
+                'js/gallery.js',
+                'js/link-generator.js',
+                'js/create.js',
+                'js/view.js',
+                'create.html',
+                'view.html',
+                'css/create.css',
+                'css/view.css'
+            ];
+
+            for (const arquivo of arquivos) {
+                try {
+                    const response = await fetch(arquivo, { method: 'HEAD' });
+                    if (response.ok) {
+                        console.log(`✅ ${arquivo}`);
+                    } else {
+                        console.error(`❌ ${arquivo} - não encontrado`);
+                    }
+                } catch (error) {
+                    console.error(`❌ ${arquivo} - erro ao verificar`);
+                }
+            }
+
+            // Teste 4: Verificar APIs do navegador
+            console.log('\n4️⃣ Verificando APIs do navegador...');
+            console.log('FileReader:', typeof FileReader !== 'undefined' ? '✅' : '❌');
+            console.log('Clipboard API:', navigator.clipboard ? '✅' : '❌');
+            console.log('Canvas:', document.createElement('canvas').getContext ? '✅' : '❌');
+            console.log('Blob:', typeof Blob !== 'undefined' ? '✅' : '❌');
+
+            console.log('\n✨ Testes concluídos! Verifique os resultados acima.');
+            alert('✅ Testes concluídos! Abra o Console (F12) para ver os resultados.');
+        }
+    </script>
+</body>
+</html>

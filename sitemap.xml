@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <!-- Página Principal -->
+  <url>
+    <loc>https://seu-site.netlify.app/</loc>
+    <lastmod>2024-12-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- Criar Página -->
+  <url>
+    <loc>https://seu-site.netlify.app/create.html</loc>
+    <lastmod>2024-12-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Login -->
+  <url>
+    <loc>https://seu-site.netlify.app/login.html</loc>
+    <lastmod>2024-12-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Registro -->
+  <url>
+    <loc>https://seu-site.netlify.app/register.html</loc>
+    <lastmod>2024-12-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Dashboard -->
+  <url>
+    <loc>https://seu-site.netlify.app/dashboard.html</loc>
+    <lastmod>2024-12-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- Guia Rápido -->
+  <url>
+    <loc>https://seu-site.netlify.app/GUIA_RAPIDO.html</loc>
+    <lastmod>2024-12-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- Ajuda Conta -->
+  <url>
+    <loc>https://seu-site.netlify.app/AJUDA_CONTA.html</loc>
+    <lastmod>2024-12-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Interativa - Eternize</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/demo.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">✨ Eternize</a>
+                <div class="demo-badge-nav">Modo Demo</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Demo Hero -->
+    <section class="demo-hero">
+        <div class="container">
+            <div class="demo-hero-content">
+                <span class="hero-badge">🎯 Experiência Completa</span>
+                <h1>Teste o Eternize Agora!</h1>
+                <p>Explore todas as funcionalidades sem compromisso. Veja como é fácil eternizar memórias.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Steps -->
+    <section class="demo-steps-section">
+        <div class="container">
+            <div class="demo-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-label">
+                    <span id="currentStep">1</span> de 4 etapas
+                </div>
+            </div>
+
+            <!-- Step 1: Criar Evento -->
+            <div class="demo-step active" id="step1">
+                <div class="step-content">
+                    <div class="step-info">
+                        <span class="step-badge">Etapa 1</span>
+                        <h2>Crie Seu Evento Demo</h2>
+                        <p>Vamos criar um evento de teste para você experimentar todas as funcionalidades.</p>
+                    </div>
+
+                    <div class="demo-form">
+                        <div class="form-group">
+                            <label for="demoEventName">Nome do Evento</label>
+                            <input type="text" id="demoEventName" value="Meu Casamento dos Sonhos" placeholder="Ex: Casamento Maria & João">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="demoEventDate">Data do Evento</label>
+                            <input type="date" id="demoEventDate">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Escolha um Tema</label>
+                            <div class="theme-selector">
+                                <input type="radio" name="demoTheme" value="rosa" id="demoRosa" checked>
+                                <label for="demoRosa" class="theme-option theme-rosa">
+                                    <span class="theme-preview"></span>
+                                    <span>Rosa</span>
+                                </label>
+
+                                <input type="radio" name="demoTheme" value="azul" id="demoAzul">
+                                <label for="demoAzul" class="theme-option theme-azul">
+                                    <span class="theme-preview"></span>
+                                    <span>Azul</span>
+                                </label>
+
+                                <input type="radio" name="demoTheme" value="menta" id="demoMenta">
+                                <label for="demoMenta" class="theme-option theme-menta">
+                                    <span class="theme-preview"></span>
+                                    <span>Menta</span>
+                                </label>
+
+                                <input type="radio" name="demoTheme" value="ouro" id="demoOuro">
+                                <label for="demoOuro" class="theme-option theme-ouro">
+                                    <span class="theme-preview"></span>
+                                    <span>Ouro</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary btn-large" onclick="goToStep(2)">
+                            Criar Evento Demo →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: QR Code e Compartilhamento -->
+            <div class="demo-step" id="step2">
+                <div class="step-content">
+                    <div class="step-info">
+                        <span class="step-badge">Etapa 2</span>
+                        <h2>Compartilhe com os Convidados</h2>
+                        <p>Seu evento foi criado! Agora você pode compartilhar o QR Code ou link com os convidados.</p>
+                    </div>
+
+                    <div class="demo-share-grid">
+                        <div class="share-card">
+                            <h3>📱 QR Code</h3>
+                            <div class="qr-demo">
+                                <div class="qr-code-visual"></div>
+                            </div>
+                            <p>Imprima e coloque em pontos estratégicos do evento</p>
+                            <button class="btn btn-secondary" onclick="downloadDemoQR()">
+                                Baixar QR Code
+                            </button>
+                        </div>
+
+                        <div class="share-card">
+                            <h3>🔗 Link de Compartilhamento</h3>
+                            <div class="link-display-demo">
+                                <input type="text" value="eternize.com/evento/demo123" readonly>
+                                <button class="btn-copy-demo" onclick="copyDemoLink()">Copiar</button>
+                            </div>
+                            <p>Envie por WhatsApp, email ou redes sociais</p>
+                            <div class="share-buttons">
+                                <button class="btn-share whatsapp">WhatsApp</button>
+                                <button class="btn-share email">Email</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="demo-actions">
+                        <button class="btn btn-outline" onclick="goToStep(1)">← Voltar</button>
+                        <button class="btn btn-primary" onclick="goToStep(3)">
+                            Ver Fotos Chegando →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Recebendo Fotos -->
+            <div class="demo-step" id="step3">
+                <div class="step-content">
+                    <div class="step-info">
+                        <span class="step-badge">Etapa 3</span>
+                        <h2>Fotos Chegando em Tempo Real</h2>
+                        <p>Veja como as fotos dos convidados aparecem instantaneamente no seu álbum.</p>
+                    </div>
+
+                    <div class="demo-stats-bar">
+                        <div class="stat-item-demo">
+                            <span class="stat-icon">📸</span>
+                            <div>
+                                <strong id="photoCount">0</strong>
+                                <span>Fotos Recebidas</span>
+                            </div>
+                        </div>
+                        <div class="stat-item-demo">
+                            <span class="stat-icon">👥</span>
+                            <div>
+                                <strong id="contributorCount">0</strong>
+                                <span>Contribuidores</span>
+                            </div>
+                        </div>
+                        <div class="stat-item-demo">
+                            <span class="stat-icon">⏱️</span>
+                            <div>
+                                <strong id="timeElapsed">0s</strong>
+                                <span>Tempo Decorrido</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="demo-gallery" id="demoGallery">
+                        <!-- Photos will appear here -->
+                    </div>
+
+                    <div class="demo-simulation-controls">
+                        <button class="btn btn-secondary" id="simulateBtn" onclick="startSimulation()">
+                            ▶ Simular Recebimento de Fotos
+                        </button>
+                        <button class="btn btn-outline" onclick="stopSimulation()" style="display: none;" id="stopBtn">
+                            ⏸ Pausar Simulação
+                        </button>
+                    </div>
+
+                    <div class="demo-actions">
+                        <button class="btn btn-outline" onclick="goToStep(2)">← Voltar</button>
+                        <button class="btn btn-primary" onclick="goToStep(4)">
+                            Gerenciar Fotos →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Gerenciar e Baixar -->
+            <div class="demo-step" id="step4">
+                <div class="step-content">
+                    <div class="step-info">
+                        <span class="step-badge">Etapa 4</span>
+                        <h2>Aprove e Baixe as Memórias</h2>
+                        <p>Revise as fotos recebidas, aprove as que desejar e baixe tudo organizado.</p>
+                    </div>
+
+                    <div class="demo-tabs">
+                        <button class="tab-btn-demo active" onclick="filterDemoPhotos('all')">
+                            Todas (<span id="countAll">0</span>)
+                        </button>
+                        <button class="tab-btn-demo" onclick="filterDemoPhotos('pending')">
+                            Pendentes (<span id="countPending">0</span>)
+                        </button>
+                        <button class="tab-btn-demo" onclick="filterDemoPhotos('approved')">
+                            Aprovadas (<span id="countApproved">0</span>)
+                        </button>
+                    </div>
+
+                    <div class="demo-gallery-manage" id="demoGalleryManage">
+                        <!-- Photos with approve/reject buttons -->
+                    </div>
+
+                    <div class="demo-download-section">
+                        <div class="download-card">
+                            <div class="download-icon">📥</div>
+                            <h3>Baixar Todas as Fotos</h3>
+                            <p>Download de <strong id="approvedCount">0</strong> fotos aprovadas em alta resolução</p>
+                            <button class="btn btn-primary btn-large" onclick="simulateDownload()">
+                                Baixar Álbum Completo
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="demo-actions">
+                        <button class="btn btn-outline" onclick="goToStep(3)">← Voltar</button>
+                        <button class="btn btn-primary" onclick="showFinalMessage()">
+                            Finalizar Demo →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Modal -->
+    <div class="modal" id="finalModal">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="final-success">
+                    <div class="success-icon-large">🎉</div>
+                    <h2>Você Experimentou o Eternize!</h2>
+                    <p>Viu como é fácil eternizar as memórias do seu evento?</p>
+
+                    <div class="final-features">
+                        <div class="final-feature">
+                            <span>✓</span>
+                            <span>Criação de evento em minutos</span>
+                        </div>
+                        <div class="final-feature">
+                            <span>✓</span>
+                            <span>Compartilhamento via QR Code</span>
+                        </div>
+                        <div class="final-feature">
+                            <span>✓</span>
+                            <span>Recebimento em tempo real</span>
+                        </div>
+                        <div class="final-feature">
+                            <span>✓</span>
+                            <span>Controle total das fotos</span>
+                        </div>
+                    </div>
+
+                    <div class="final-cta">
+                        <h3>Pronto para eternizar seu evento de verdade?</h3>
+                        <div class="final-buttons">
+                            <a href="index.html#planos" class="btn btn-primary btn-large">
+                                Ver Planos e Preços
+                            </a>
+                            <button class="btn btn-secondary" onclick="restartDemo()">
+                                Refazer Demo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="js/demo.js"></script>
+</body>
+</html>

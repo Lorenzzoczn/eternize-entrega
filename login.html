@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Eternize</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="logo-large">✨</div>
+                    <h1>Eternize</h1>
+                    <p>Entre na sua conta</p>
+                </div>
+
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Senha</label>
+                        <input type="password" id="password" required>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="remember">
+                            <span>Lembrar de mim</span>
+                        </label>
+                        <a href="#" class="link-secondary">Esqueceu a senha?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Entrar
+                    </button>
+                </form>
+
+                <div class="login-divider">
+                    <span>ou</span>
+                </div>
+
+                <div class="login-options">
+                    <p>Ainda não tem conta? <a href="register.html" class="link-secondary">Criar conta</a></p>
+                    <p style="margin-top: 15px;">Ou <a href="create.html" class="link-secondary">✨ Usar sem cadastro</a></p>
+                </div>
+            </div>
+
+            <div class="login-features">
+                <h3>Por que usar o Eternize?</h3>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">📸</span>
+                        <div>
+                            <strong>Fotos Ilimitadas</strong>
+                            <p>Receba quantas fotos quiser dos seus convidados</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🔒</span>
+                        <div>
+                            <strong>100% Seguro</strong>
+                            <p>Suas memórias protegidas com criptografia</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">⚡</span>
+                        <div>
+                            <strong>Tempo Real</strong>
+                            <p>Veja as fotos chegando durante o evento</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/login.js"></script>
+</body>
+</html>

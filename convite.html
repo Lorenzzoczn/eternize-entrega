@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Convite com QR Code - Eternize</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/convite.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">✨ Eternize</a>
+                <a href="dashboard.html" class="btn-nav">← Voltar ao Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="convite-container">
+        <div class="convite-header">
+            <h1>🎨 Criar Convite com QR Code</h1>
+            <p>Escolha um preset, personalize e baixe para imprimir</p>
+        </div>
+
+        <div class="convite-content">
+            <!-- Sidebar de Configuração -->
+            <div class="convite-sidebar">
+                <div class="config-section">
+                    <h3>📋 Informações do Evento</h3>
+                    <div class="form-group">
+                        <label>Nome do Evento</label>
+                        <input type="text" id="eventoNome" placeholder="Casamento Ana & Lucas">
+                    </div>
+                    <div class="form-group">
+                        <label>Data</label>
+                        <input type="date" id="eventoData">
+                    </div>
+                    <div class="form-group">
+                        <label>Mensagem Personalizada</label>
+                        <textarea id="eventoMensagem" rows="3" placeholder="Escaneie o QR Code e compartilhe suas fotos deste momento especial conosco."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Foto do Evento (opcional)</label>
+                        <input type="file" id="eventoFoto" accept="image/*">
+                        <div id="fotoPreview" class="foto-preview"></div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h3>🎨 Escolha o Preset</h3>
+                    <div class="presets-grid">
+                        <button class="preset-btn active" data-preset="1">
+                            <span class="preset-icon">✨</span>
+                            <span>Minimalista</span>
+                        </button>
+                        <button class="preset-btn" data-preset="2">
+                            <span class="preset-icon">💍</span>
+                            <span>Casamento</span>
+                        </button>
+                        <button class="preset-btn" data-preset="3">
+                            <span class="preset-icon">🎯</span>
+                            <span>Moderno</span>
+                        </button>
+                        <button class="preset-btn" data-preset="4">
+                            <span class="preset-icon">🌸</span>
+                            <span>Floral</span>
+                        </button>
+                        <button class="preset-btn" data-preset="5">
+                            <span class="preset-icon">📸</span>
+                            <span>Polaroid</span>
+                        </button>
+                        <button class="preset-btn" data-preset="6">
+                            <span class="preset-icon">🎉</span>
+                            <span>Festa</span>
+                        </button>
+                        <button class="preset-btn" data-preset="7">
+                            <span class="preset-icon">🌙</span>
+                            <span>Dark</span>
+                        </button>
+                        <button class="preset-btn" data-preset="8">
+                            <span class="preset-icon">📜</span>
+                            <span>Vintage</span>
+                        </button>
+                        <button class="preset-btn" data-preset="9">
+                            <span class="preset-icon">👑</span>
+                            <span>Premium</span>
+                        </button>
+                        <button class="preset-btn" data-preset="10">
+                            <span class="preset-icon">🎨</span>
+                            <span>Criativo</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h3>🎨 Personalização</h3>
+                    <div class="form-group">
+                        <label>Cor Principal</label>
+                        <input type="color" id="corPrincipal" value="#E4D9B6">
+                    </div>
+                    <div class="form-group">
+                        <label>Cor Secundária</label>
+                        <input type="color" id="corSecundaria" value="#FFD1DC">
+                    </div>
+                    <div class="form-group">
+                        <label>Tamanho do Convite</label>
+                        <select id="tamanhoConvite">
+                            <option value="a5">A5 (148 x 210 mm)</option>
+                            <option value="a6">A6 (105 x 148 mm)</option>
+                            <option value="quadrado">Quadrado (150 x 150 mm)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="config-actions">
+                    <button class="btn btn-primary btn-block" id="downloadPNG">
+                        📥 Baixar PNG
+                    </button>
+                    <button class="btn btn-secondary btn-block" id="downloadPDF">
+                        📄 Baixar PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Preview do Convite -->
+            <div class="convite-preview-area">
+                <div class="preview-header">
+                    <h3>👁️ Preview em Tempo Real</h3>
+                    <div class="preview-zoom">
+                        <button id="zoomOut">-</button>
+                        <span id="zoomLevel">100%</span>
+                        <button id="zoomIn">+</button>
+                    </div>
+                </div>
+                
+                <div class="preview-container" id="previewContainer">
+                    <div class="convite-card" id="conviteCard" data-preset="1">
+                        <!-- Conteúdo será gerado dinamicamente -->
+                    </div>
+                </div>
+
+                <div class="preview-info">
+                    <p>💡 <strong>Dica:</strong> Imprima em papel fotográfico para melhor qualidade</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p id="loadingText">Gerando convite...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="js/convite-presets.js"></script>
+    <script src="js/convite-generator.js"></script>
+</body>
+</html>

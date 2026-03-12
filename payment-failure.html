@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Não Aprovado - Eternize</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .failure-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #FFFFFF 0%, #FFE5E5 100%);
+            padding: 20px;
+        }
+
+        .failure-card {
+            background: white;
+            border-radius: 25px;
+            padding: 60px 40px;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .failure-icon {
+            font-size: 5rem;
+            margin-bottom: 30px;
+            animation: shake 0.5s ease 0.3s backwards;
+        }
+
+        .failure-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .failure-message {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .reasons-list {
+            background: rgba(255, 229, 229, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .reasons-list h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .reason-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            color: #666;
+        }
+
+        .reason-icon {
+            color: #f44336;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 18px 40px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #E4D9B6 0%, #FFD1DC 100%);
+            color: #333;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #333;
+            border: 2px solid #E4D9B6;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="failure-container">
+        <div class="failure-card">
+            <div class="failure-icon">😔</div>
+            <h1 class="failure-title">Pagamento Não Aprovado</h1>
+            <p class="failure-message">
+                Infelizmente seu pagamento não foi aprovado.<br>
+                Não se preocupe, você pode tentar novamente.
+            </p>
+
+            <div class="reasons-list">
+                <h3>Possíveis Motivos</h3>
+                <div class="reason-item">
+                    <span class="reason-icon">•</span>
+                    <span>Saldo insuficiente no cartão</span>
+                </div>
+                <div class="reason-item">
+                    <span class="reason-icon">•</span>
+                    <span>Dados do cartão incorretos</span>
+                </div>
+                <div class="reason-item">
+                    <span class="reason-icon">•</span>
+                    <span>Cartão bloqueado ou vencido</span>
+                </div>
+                <div class="reason-item">
+                    <span class="reason-icon">•</span>
+                    <span>Limite de compras excedido</span>
+                </div>
+                <div class="reason-item">
+                    <span class="reason-icon">•</span>
+                    <span>Problema temporário com a operadora</span>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <a href="plans.html" class="btn btn-primary">
+                    Tentar Novamente
+                </a>
+                <a href="dashboard.html" class="btn btn-secondary">
+                    Voltar ao Dashboard
+                </a>
+            </div>
+
+            <p style="margin-top: 30px; color: #999; font-size: 0.9rem;">
+                Precisa de ajuda? Entre em contato com nosso suporte
+            </p>
+        </div>
+    </div>
+</body>
+</html>

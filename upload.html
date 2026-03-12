@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Fotos - Eternize</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/upload.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="upload-page">
+        <div class="upload-container">
+            <div class="upload-header">
+                <div class="logo-upload">✨</div>
+                <h1 id="eventName">Envie suas Memórias</h1>
+                <p>Compartilhe fotos e vídeos deste momento especial</p>
+            </div>
+
+            <div id="uploadSection">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📸</div>
+                    <h3>Arraste fotos ou vídeos aqui</h3>
+                    <p>ou clique para selecionar</p>
+                    <input type="file" id="fileInput" multiple accept="image/*,video/*" hidden>
+                </div>
+
+                <div class="upload-preview" id="uploadPreview"></div>
+
+                <button class="btn btn-primary btn-block" id="uploadBtn" style="display: none;">
+                    Enviar Memórias
+                </button>
+            </div>
+
+            <div id="successSection" class="upload-success" style="display: none;">
+                <div class="success-icon">✓</div>
+                <h2>Fotos Enviadas com Sucesso!</h2>
+                <p>Suas memórias foram recebidas e estão sendo processadas.</p>
+                <button class="btn btn-secondary" id="uploadMoreBtn">
+                    Enviar Mais Fotos
+                </button>
+            </div>
+
+            <div class="upload-info">
+                <h4>Informações Importantes:</h4>
+                <ul>
+                    <li>✓ Formatos aceitos: JPG, PNG, MP4, MOV</li>
+                    <li>✓ Tamanho máximo por arquivo: 50MB</li>
+                    <li>✓ Suas fotos serão revisadas antes de aparecerem no álbum</li>
+                    <li>✓ Mantenha o respeito e a privacidade de todos</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/upload.js"></script>
+</body>
+</html>

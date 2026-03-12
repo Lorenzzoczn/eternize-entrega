@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Aprovado - Eternize</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .success-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #FFFFFF 0%, #FFD1DC 100%);
+            padding: 20px;
+        }
+
+        .success-card {
+            background: white;
+            border-radius: 25px;
+            padding: 60px 40px;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            margin-bottom: 30px;
+            animation: scaleIn 0.5s ease 0.3s backwards;
+        }
+
+        .success-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .features-list {
+            background: rgba(228, 217, 182, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .features-list h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            color: #333;
+        }
+
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #E4D9B6 0%, #FFD1DC 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .btn-dashboard {
+            display: inline-block;
+            padding: 18px 50px;
+            background: linear-gradient(135deg, #E4D9B6 0%, #FFD1DC 100%);
+            color: #333;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-dashboard:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-card">
+            <div class="success-icon">🎉</div>
+            <h1 class="success-title">Pagamento Aprovado!</h1>
+            <p class="success-message">
+                Parabéns! Seu plano Premium foi ativado com sucesso.<br>
+                Agora você tem acesso a todos os recursos exclusivos do Eternize.
+            </p>
+
+            <div class="features-list">
+                <h3>✨ Recursos Desbloqueados</h3>
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>Eventos ilimitados</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>Upload ilimitado de fotos</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>QR Code personalizado</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>Galeria privada</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>Download de todas as fotos</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>Suporte prioritário</span>
+                </div>
+            </div>
+
+            <a href="dashboard.html?premium=activated" class="btn-dashboard">
+                Ir para o Dashboard
+            </a>
+
+            <p style="margin-top: 30px; color: #999; font-size: 0.9rem;">
+                Você receberá um email de confirmação em breve
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Processar ativação do premium
+        setTimeout(() => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentId = urlParams.get('payment_id');
+            
+            if (paymentId) {
+                console.log('Payment ID:', paymentId);
+                // Aqui você pode fazer uma chamada adicional para confirmar o pagamento
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

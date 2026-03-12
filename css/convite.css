@@ -1,0 +1,635 @@
+/* ===== CONVITE STYLES ===== */
+
+.convite-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 100px 20px 50px;
+}
+
+.convite-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.convite-header h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.convite-header p {
+    font-size: 1.1rem;
+    color: #666;
+}
+
+.convite-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 30px;
+}
+
+/* Sidebar de Configuração */
+.convite-sidebar {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
+
+.config-section {
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #eee;
+}
+
+.config-section:last-of-type {
+    border-bottom: none;
+}
+
+.config-section h3 {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #E4D9B6;
+    box-shadow: 0 0 0 3px rgba(228, 217, 182, 0.1);
+}
+
+.form-group input[type="color"] {
+    width: 100%;
+    height: 50px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.form-group input[type="file"] {
+    padding: 10px;
+    border: 2px dashed #e0e0e0;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.foto-preview {
+    margin-top: 15px;
+    border-radius: 10px;
+    overflow: hidden;
+    display: none;
+}
+
+.foto-preview img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Presets Grid */
+.presets-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.preset-btn {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 15px 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.preset-btn:hover {
+    border-color: #E4D9B6;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.preset-btn.active {
+    border-color: #E4D9B6;
+    background: linear-gradient(135deg, #E4D9B6 0%, #FFD1DC 100%);
+    color: white;
+}
+
+.preset-icon {
+    font-size: 1.5rem;
+}
+
+.preset-btn span:last-child {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Config Actions */
+.config-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-block {
+    width: 100%;
+}
+
+/* Preview Area */
+.convite-preview-area {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.preview-header h3 {
+    font-size: 1.3rem;
+    color: #333;
+}
+
+.preview-zoom {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.preview-zoom button {
+    width: 35px;
+    height: 35px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s;
+}
+
+.preview-zoom button:hover {
+    border-color: #E4D9B6;
+    background: #E4D9B6;
+    color: white;
+}
+
+.preview-zoom span {
+    font-weight: 600;
+    color: #666;
+    min-width: 50px;
+    text-align: center;
+}
+
+.preview-container {
+    background: #f5f5f5;
+    border-radius: 15px;
+    padding: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 600px;
+    overflow: auto;
+}
+
+/* Convite Card Base */
+.convite-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    transition: transform 0.3s;
+    position: relative;
+}
+
+.convite-card.size-a5 {
+    width: 420px;
+    height: 594px;
+}
+
+.convite-card.size-a6 {
+    width: 297px;
+    height: 420px;
+}
+
+.convite-card.size-quadrado {
+    width: 450px;
+    height: 450px;
+}
+
+/* Preset Styles */
+
+/* Preset 1: Minimalista */
+.convite-card[data-preset="1"] {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 50px;
+    background: linear-gradient(135deg, var(--cor-principal, #E4D9B6) 0%, var(--cor-secundaria, #FFD1DC) 100%);
+}
+
+.convite-card[data-preset="1"] .convite-header-content {
+    text-align: center;
+}
+
+.convite-card[data-preset="1"] .convite-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.convite-card[data-preset="1"] .convite-date {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 20px;
+}
+
+.convite-card[data-preset="1"] .convite-message {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
+    text-align: center;
+}
+
+.convite-card[data-preset="1"] .convite-qr-section {
+    text-align: center;
+}
+
+.convite-card[data-preset="1"] .qr-container {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    display: inline-block;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.convite-card[data-preset="1"] .qr-instruction {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: white;
+    font-weight: 600;
+}
+
+/* Preset 2: Casamento Clássico */
+.convite-card[data-preset="2"] {
+    background: white;
+    border: 3px solid var(--cor-principal, #E4D9B6);
+    padding: 40px;
+}
+
+.convite-card[data-preset="2"] .convite-header-content {
+    text-align: center;
+    border-bottom: 2px solid var(--cor-principal, #E4D9B6);
+    padding-bottom: 30px;
+    margin-bottom: 30px;
+}
+
+.convite-card[data-preset="2"] .convite-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.convite-card[data-preset="2"] .convite-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.convite-card[data-preset="2"] .convite-date {
+    font-size: 1.1rem;
+    color: #666;
+}
+
+.convite-card[data-preset="2"] .convite-message {
+    text-align: center;
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+
+.convite-card[data-preset="2"] .convite-qr-section {
+    text-align: center;
+}
+
+.convite-card[data-preset="2"] .qr-container {
+    background: var(--cor-secundaria, #FFD1DC);
+    padding: 20px;
+    border-radius: 15px;
+    display: inline-block;
+}
+
+/* Preset 3: Moderno Clean */
+.convite-card[data-preset="3"] {
+    background: white;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.convite-card[data-preset="3"] .convite-left {
+    background: var(--cor-principal, #E4D9B6);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.convite-card[data-preset="3"] .convite-right {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.convite-card[data-preset="3"] .convite-title {
+    font-size: 2rem;
+    color: white;
+    margin-bottom: 15px;
+}
+
+.convite-card[data-preset="3"] .convite-date {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+.convite-card[data-preset="3"] .convite-message {
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
+}
+
+/* Preset 4: Romântico Floral */
+.convite-card[data-preset="4"] {
+    background: linear-gradient(to bottom, white 0%, #fff5f8 100%);
+    padding: 50px;
+    position: relative;
+}
+
+.convite-card[data-preset="4"]::before {
+    content: '🌸';
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 3rem;
+    opacity: 0.3;
+}
+
+.convite-card[data-preset="4"]::after {
+    content: '🌸';
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    font-size: 3rem;
+    opacity: 0.3;
+}
+
+.convite-card[data-preset="4"] .convite-header-content {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.convite-card[data-preset="4"] .convite-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: var(--cor-principal, #E4D9B6);
+    margin-bottom: 10px;
+}
+
+/* Preset 5: Estilo Polaroid */
+.convite-card[data-preset="5"] {
+    background: #f0f0f0;
+    padding: 30px;
+}
+
+.convite-card[data-preset="5"] .polaroid-frame {
+    background: white;
+    padding: 20px 20px 60px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transform: rotate(-2deg);
+}
+
+.convite-card[data-preset="5"] .convite-photo {
+    width: 100%;
+    height: 250px;
+    background: #ddd;
+    margin-bottom: 20px;
+}
+
+/* Preset 6: Estilo Festa */
+.convite-card[data-preset="6"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 40px;
+    color: white;
+}
+
+.convite-card[data-preset="6"] .confetti {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Preset 7: Minimal Dark */
+.convite-card[data-preset="7"] {
+    background: #1a1a1a;
+    color: white;
+    padding: 50px;
+}
+
+.convite-card[data-preset="7"] .convite-title {
+    color: var(--cor-principal, #E4D9B6);
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+/* Preset 8: Estilo Vintage */
+.convite-card[data-preset="8"] {
+    background: #f4e8d8;
+    border: 10px solid #8b7355;
+    padding: 40px;
+    position: relative;
+}
+
+.convite-card[data-preset="8"]::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    border: 2px solid #8b7355;
+    pointer-events: none;
+}
+
+/* Preset 9: Elegante Premium */
+.convite-card[data-preset="9"] {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: white;
+    padding: 50px;
+    position: relative;
+}
+
+.convite-card[data-preset="9"]::before {
+    content: '👑';
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 3rem;
+}
+
+.convite-card[data-preset="9"] .convite-title {
+    color: var(--cor-principal, #E4D9B6);
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    text-align: center;
+    margin-top: 60px;
+    margin-bottom: 20px;
+}
+
+/* Preset 10: Criativo com Moldura */
+.convite-card[data-preset="10"] {
+    background: white;
+    padding: 20px;
+}
+
+.convite-card[data-preset="10"] .creative-frame {
+    border: 5px solid var(--cor-principal, #E4D9B6);
+    border-radius: 30px;
+    padding: 40px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+}
+
+.convite-card[data-preset="10"] .creative-frame::before {
+    content: '🎨';
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 0 15px;
+    font-size: 2rem;
+}
+
+/* Preview Info */
+.preview-info {
+    margin-top: 20px;
+    padding: 15px;
+    background: #fff3cd;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.preview-info p {
+    margin: 0;
+    color: #856404;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.loading-spinner {
+    text-align: center;
+    color: white;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .convite-content {
+        grid-template-columns: 1fr;
+    }
+
+    .convite-sidebar {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .convite-header h1 {
+        font-size: 2rem;
+    }
+
+    .presets-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .preview-container {
+        padding: 20px;
+    }
+
+    .convite-card {
+        transform: scale(0.7);
+    }
+}

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu de Navegação - Eternize</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .menu-page {
+            min-height: 100vh;
+            background: var(--gradient-rosa);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .menu-container {
+            background: var(--white);
+            padding: 60px;
+            border-radius: 30px;
+            box-shadow: 0 25px 70px var(--shadow-medium);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .menu-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .menu-logo {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        .menu-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .menu-header p {
+            font-size: 1.2rem;
+            color: var(--cinza-medio);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .menu-item {
+            background: var(--gradient-azul);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--cinza-escuro);
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px var(--shadow-medium);
+        }
+
+        .menu-item.featured {
+            background: var(--gradient-ouro);
+            grid-column: 1 / -1;
+        }
+
+        .menu-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .menu-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-item p {
+            color: var(--cinza-medio);
+            font-size: 0.95rem;
+        }
+
+        .menu-badge {
+            display: inline-block;
+            background: var(--verde-menta);
+            color: var(--cinza-escuro);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .menu-docs {
+            background: var(--off-white);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .menu-docs h4 {
+            margin-bottom: 15px;
+        }
+
+        .doc-links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .doc-link {
+            color: var(--ouro-fosco);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .doc-link:hover {
+            color: var(--cinza-escuro);
+        }
+
+        @media (max-width: 768px) {
+            .menu-container {
+                padding: 40px 25px;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .menu-item.featured {
+                grid-column: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-page">
+        <div class="menu-container">
+            <div class="menu-header">
+                <div class="menu-logo">✨</div>
+                <h1>Eternize</h1>
+                <p>Escolha por onde começar</p>
+            </div>
+
+            <div class="menu-grid">
+                <a href="demo.html" class="menu-item featured">
+                    <div class="menu-icon">🎯</div>
+                    <h3>Modo Demo</h3>
+                    <p>Teste todas as funcionalidades sem cadastro</p>
+                    <span class="menu-badge">Recomendado</span>
+                </a>
+
+                <a href="index.html" class="menu-item">
+                    <div class="menu-icon">🏠</div>
+                    <h3>Landing Page</h3>
+                    <p>Página inicial com planos e recursos</p>
+                </a>
+
+                <a href="checkout.html?plan=premium" class="menu-item">
+                    <div class="menu-icon">💳</div>
+                    <h3>Checkout</h3>
+                    <p>Processo de compra completo</p>
+                </a>
+
+                <a href="login.html" class="menu-item">
+                    <div class="menu-icon">🔐</div>
+                    <h3>Login</h3>
+                    <p>Área de autenticação</p>
+                </a>
+
+                <a href="dashboard.html" class="menu-item">
+                    <div class="menu-icon">📊</div>
+                    <h3>Dashboard</h3>
+                    <p>Painel de gerenciamento</p>
+                </a>
+
+                <a href="upload.html?event=demo" class="menu-item">
+                    <div class="menu-icon">📸</div>
+                    <h3>Upload</h3>
+                    <p>Interface para convidados</p>
+                </a>
+            </div>
+
+            <div class="menu-docs">
+                <h4>📚 Documentação</h4>
+                <div class="doc-links">
+                    <a href="README.md" class="doc-link" target="_blank">README</a>
+                    <a href="INICIO_RAPIDO.md" class="doc-link" target="_blank">Início Rápido</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

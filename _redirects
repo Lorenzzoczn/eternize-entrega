@@ -1,0 +1,12 @@
+# Redirects para Netlify
+
+# Página 404 personalizada
+/404.html /index.html 404
+
+# SPA fallback (para URLs dinâmicas)
+/view/* /view.html 200
+/create/* /create.html 200
+/dashboard/* /dashboard.html 200
+
+# Redirects antigos (se houver)
+/old-page /index.html 301

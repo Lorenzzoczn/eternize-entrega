@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta - Eternize</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="logo-large">✨</div>
+                    <h1>Criar Conta</h1>
+                    <p>Comece a eternizar seus momentos</p>
+                </div>
+
+                <form id="registerForm" class="login-form">
+                    <div class="form-group">
+                        <label for="name">Nome Completo</label>
+                        <input type="text" id="name" required placeholder="Seu nome">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" required placeholder="seu@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Telefone</label>
+                        <input type="tel" id="phone" placeholder="(31) 99999-9999">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Senha</label>
+                        <input type="password" id="password" required placeholder="Mínimo 6 caracteres">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmar Senha</label>
+                        <input type="password" id="confirmPassword" required placeholder="Digite a senha novamente">
+                    </div>
+
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="terms" required>
+                            <span>Aceito os <a href="#" class="link-secondary">termos de uso</a></span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Criar Conta
+                    </button>
+                </form>
+
+                <div class="login-divider">
+                    <span>ou</span>
+                </div>
+
+                <div class="login-options">
+                    <p>Já tem uma conta? <a href="login.html" class="link-secondary">Fazer login</a></p>
+                    <p style="margin-top: 15px;">Ou <a href="create.html" class="link-secondary">✨ Usar sem cadastro</a></p>
+                </div>
+            </div>
+
+            <div class="login-features">
+                <h3>Benefícios de criar conta</h3>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">💾</span>
+                        <div>
+                            <strong>Salvar Eventos</strong>
+                            <p>Mantenha todos os seus eventos organizados</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📊</span>
+                        <div>
+                            <strong>Dashboard Completo</strong>
+                            <p>Gerencie todos os seus álbuns em um só lugar</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🎯</span>
+                        <div>
+                            <strong>Recursos Premium</strong>
+                            <p>Acesso a funcionalidades exclusivas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/register.js"></script>
+</body>
+</html>

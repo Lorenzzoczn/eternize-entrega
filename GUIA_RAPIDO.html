@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Rápido - Sistema Eternize</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+        }
+
+        .emoji-large {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .card p {
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .card ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .card li {
+            padding: 8px 0;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .card li::before {
+            content: '✓ ';
+            color: #2ecc71;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+        }
+
+        .flow-section {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 50px;
+        }
+
+        .flow-section h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #2c3e50;
+        }
+
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+
+        .step-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+            min-width: 80px;
+        }
+
+        .step-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .step-content p {
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+
+        .tech-stack {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .tech-stack h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .tech-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tech-item h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .flow-step {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .step-number {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="emoji-large">✨</div>
+            <h1>Sistema Eternize</h1>
+            <p>Upload de Fotos + Link Único + QR Code</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-icon">📸</div>
+                <h2>Upload de Fotos</h2>
+                <p>Sistema completo de upload com preview e galeria</p>
+                <ul>
+                    <li>Upload múltiplo</li>
+                    <li>Arraste e solte</li>
+                    <li>Preview instantâneo</li>
+                    <li>Remover fotos</li>
+                    <li>IndexedDB storage</li>
+                </ul>
+                <a href="create.html" class="btn btn-primary">Testar Upload</a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🔗</div>
+                <h2>Link Único</h2>
+                <p>Gere links compartilháveis para suas páginas</p>
+                <ul>
+                    <li>ID único gerado</li>
+                    <li>URL compartilhável</li>
+                    <li>Copiar link</li>
+                    <li>Carregamento automático</li>
+                    <li>Sem backend</li>
+                </ul>
+                <a href="create.html" class="btn btn-primary">Gerar Link</a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📱</div>
+                <h2>QR Code</h2>
+                <p>Gere e baixe QR Codes automaticamente</p>
+                <ul>
+                    <li>Geração automática</li>
+                    <li>Alta qualidade</li>
+                    <li>Download PNG</li>
+                    <li>Escaneável</li>
+                    <li>Personalizável</li>
+                </ul>
+                <a href="create.html" class="btn btn-primary">Gerar QR Code</a>
+            </div>
+        </div>
+
+        <div class="flow-section">
+            <h2>🎯 Como Funciona</h2>
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Criar Página</h3>
+                        <p>Acesse create.html e preencha título, descrição e data do evento</p>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Adicionar Fotos</h3>
+                        <p>Arraste fotos ou clique para selecionar. Veja preview antes de salvar</p>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Finalizar</h3>
+                        <p>Clique em "Finalizar e Gerar Link" para criar sua página</p>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Compartilhar</h3>
+                        <p>Copie o link ou baixe o QR Code para compartilhar com outras pessoas</p>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Visualizar</h3>
+                        <p>Acesse o link gerado para ver a página com todas as fotos e informações</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-stack">
+            <h2>🔧 Tecnologias Utilizadas</h2>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <h3>HTML5</h3>
+                    <p>Estrutura semântica</p>
+                </div>
+                <div class="tech-item">
+                    <h3>CSS3</h3>
+                    <p>Design responsivo</p>
+                </div>
+                <div class="tech-item">
+                    <h3>JavaScript</h3>
+                    <p>Lógica pura (sem frameworks)</p>
+                </div>
+                <div class="tech-item">
+                    <h3>IndexedDB</h3>
+                    <p>Armazenamento robusto</p>
+                </div>
+                <div class="tech-item">
+                    <h3>QRCode.js</h3>
+                    <p>Geração de QR Codes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-icon">📖</div>
+                <h2>Documentação</h2>
+                <p>Guias completos de uso e integração</p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="INSTRUCOES_USO.md" class="btn btn-secondary">Instruções de Uso</a>
+                    <a href="INTEGRACAO.md" class="btn btn-secondary">Guia de Integração</a>
+                    <a href="RESUMO_IMPLEMENTACAO.md" class="btn btn-secondary">Resumo Técnico</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🧪</div>
+                <h2>Testar Sistema</h2>
+                <p>Teste todas as funcionalidades agora</p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="create.html" class="btn btn-success">Criar Página</a>
+                    <a href="EXEMPLO_TESTE.html" class="btn btn-success">Página de Testes</a>
+                    <a href="index.html" class="btn btn-secondary">Site Principal</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">✅</div>
+                <h2>Checklist</h2>
+                <p>Tudo implementado e funcionando</p>
+                <ul>
+                    <li>Upload múltiplo ✓</li>
+                    <li>Preview de fotos ✓</li>
+                    <li>Galeria completa ✓</li>
+                    <li>Link único ✓</li>
+                    <li>QR Code ✓</li>
+                    <li>Download QR ✓</li>
+                    <li>Página de view ✓</li>
+                    <li>100% offline ✓</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Desenvolvido com ❤️ para o projeto <a href="index.html">Eternize</a></p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">
+                Sistema completo de upload, galeria, link único e QR Code<br>
+                Sem backend • Totalmente offline • JavaScript puro
+            </p>
+        </div>
+    </div>
+</body>
+</html>

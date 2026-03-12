@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Eternize v3</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">✨ Eternize Admin</a>
+                <div class="nav-actions">
+                    <button class="btn btn-primary" onclick="openCreateEventModal()">
+                        ➕ Criar Evento
+                    </button>
+                    <button class="btn btn-secondary" onclick="logout()">
+                        🚪 Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <div class="container">
+            <!-- Dashboard Stats -->
+            <section class="admin-stats">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🎉</div>
+                        <div class="stat-info">
+                            <h3 id="totalEvents">0</h3>
+                            <p>Eventos Ativos</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📸</div>
+                        <div class="stat-info">
+                            <h3 id="totalPhotos">0</h3>
+                            <p>Fotos Enviadas</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <h3 id="approvedPhotos">0</h3>
+                            <p>Fotos Aprovadas</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-info">
+                            <h3 id="pendingPhotos">0</h3>
+                            <p>Aguardando Aprovação</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Events Management -->
+            <section class="admin-events">
+                <div class="section-header">
+                    <h2>Gerenciar Eventos</h2>
+                    <div class="section-actions">
+                        <input type="text" id="searchEvents" placeholder="🔍 Buscar eventos..." class="search-input">
+                        <select id="filterTheme" class="filter-select">
+                            <option value="">Todos os Temas</option>
+                            <option value="toy-story">Toy Story</option>
+                            <option value="princesas">Princesas</option>
+                            <option value="neutro">Neutro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="events-grid" id="eventsGrid">
+                    <!-- Events will be loaded here -->
+                </div>
+
+                <div class="empty-state" id="emptyEvents" style="display: none;">
+                    <div class="empty-icon">🎭</div>
+                    <h3>Nenhum evento encontrado</h3>
+                    <p>Crie seu primeiro evento para começar!</p>
+                    <button class="btn btn-primary" onclick="openCreateEventModal()">
+                        ➕ Criar Primeiro Evento
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Create Event Modal -->
+    <div class="modal" id="createEventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✨ Criar Novo Evento</h2>
+                <button class="modal-close" onclick="closeCreateEventModal()">&times;</button>
+            </div>
+            <form id="createEventForm" class="modal-body">
+                <div class="form-group">
+                    <label for="eventName">Nome do Evento *</label>
+                    <input type="text" id="eventName" name="nome_evento" required maxlength="100" 
+                           placeholder="Ex: Casamento da Maria e João">
+                </div>
+
+                <div class="form-group">
+                    <label for="eventDate">Data do Evento *</label>
+                    <input type="date" id="eventDate" name="data_evento" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Tema do Evento *</label>
+                    <div class="theme-selector">
+                        <div class="theme-option">
+                            <input type="radio" id="theme-toy-story" name="tema" value="toy-story">
+                            <label for="theme-toy-story" class="theme-card theme-toy-story">
+                                <div class="theme-icon">🚀</div>
+                                <div class="theme-name">Toy Story</div>
+                                <div class="theme-colors">
+                                    <span style="background: #FFD700;"></span>
+                                    <span style="background: #FF0000;"></span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="theme-option">
+                            <input type="radio" id="theme-princesas" name="tema" value="princesas">
+                            <label for="theme-princesas" class="theme-card theme-princesas">
+                                <div class="theme-icon">👑</div>
+                                <div class="theme-name">Princesas</div>
+                                <div class="theme-colors">
+                                    <span style="background: #FFB6C1;"></span>
+                                    <span style="background: #DDA0DD;"></span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="theme-option">
+                            <input type="radio" id="theme-neutro" name="tema" value="neutro" checked>
+                            <label for="theme-neutro" class="theme-card theme-neutro">
+                                <div class="theme-icon">✨</div>
+                                <div class="theme-name">Neutro</div>
+                                <div class="theme-colors">
+                                    <span style="background: #E4D9B6;"></span>
+                                    <span style="background: #FFD1DC;"></span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeCreateEventModal()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        ✨ Criar Evento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Event Details Modal -->
+    <div class="modal" id="eventDetailsModal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 id="eventDetailsTitle">Detalhes do Evento</h2>
+                <button class="modal-close" onclick="closeEventDetailsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Event Info -->
+                <div class="event-details-info">
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <strong>Data:</strong>
+                            <span id="eventDetailsDate"></span>
+                        </div>
+                        <div class="meta-item">
+                            <strong>Tema:</strong>
+                            <span id="eventDetailsTheme"></span>
+                        </div>
+                        <div class="meta-item">
+                            <strong>Token:</strong>
+                            <code id="eventDetailsToken"></code>
+                        </div>
+                    </div>
+
+                    <!-- QR Code and Links -->
+                    <div class="event-sharing">
+                        <div class="qr-section">
+                            <h3>QR Code</h3>
+                            <div class="qr-container" id="eventQRCode">
+                                <!-- QR Code will be generated here -->
+                            </div>
+                            <div class="qr-actions">
+                                <button class="btn btn-secondary" onclick="downloadQRCode()">
+                                    📥 Baixar QR
+                                </button>
+                                <button class="btn btn-secondary" onclick="printQRCode()">
+                                    🖨️ Imprimir
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="links-section">
+                            <h3>Links de Compartilhamento</h3>
+                            <div class="link-item">
+                                <label>Página Pública:</label>
+                                <div class="link-input-group">
+                                    <input type="text" id="publicLink" readonly>
+                                    <button class="btn btn-secondary" onclick="copyLink('publicLink')">
+                                        📋 Copiar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photos Management -->
+                <div class="photos-management">
+                    <div class="photos-header">
+                        <h3>Fotos do Evento</h3>
+                        <div class="photos-filters">
+                            <button class="filter-btn active" onclick="filterPhotos('all')" data-filter="all">
+                                Todas (<span id="countAll">0</span>)
+                            </button>
+                            <button class="filter-btn" onclick="filterPhotos('pending')" data-filter="pending">
+                                Pendentes (<span id="countPending">0</span>)
+                            </button>
+                            <button class="filter-btn" onclick="filterPhotos('approved')" data-filter="approved">
+                                Aprovadas (<span id="countApproved">0</span>)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="photos-grid" id="eventPhotosGrid">
+                        <!-- Photos will be loaded here -->
+                    </div>
+
+                    <div class="empty-photos" id="emptyPhotos" style="display: none;">
+                        <div class="empty-icon">📸</div>
+                        <p>Nenhuma foto encontrada</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Carregando...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="js/admin-panel.js"></script>
+</body>
+</html>

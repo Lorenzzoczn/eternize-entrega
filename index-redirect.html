@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eternize - Redirecionando...</title>
+    <meta http-equiv="refresh" content="0; url=start.html">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #FFFFFF 0%, #FFD1DC 100%);
+        }
+        .loader {
+            text-align: center;
+        }
+        .spinner {
+            font-size: 4rem;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        p {
+            margin-top: 20px;
+            color: #666;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="loader">
+        <div class="spinner">✨</div>
+        <p>Redirecionando...</p>
+    </div>
+    <script>
+        // Fallback redirect
+        setTimeout(() => {
+            window.location.href = 'start.html';
+        }, 100);
+    </script>
+</body>
+</html>

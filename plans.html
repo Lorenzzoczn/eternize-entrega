@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planos Premium - Eternize</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/plans.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">✨ Eternize</a>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="plans.html" class="active">Planos</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="login.html" class="btn-nav">Entrar</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="plans-hero">
+        <div class="container">
+            <div class="hero-content">
+                <span class="hero-badge">💎 Planos Premium</span>
+                <h1 class="hero-title">Escolha o Plano Ideal Para Você</h1>
+                <p class="hero-subtitle">Desbloqueie recursos exclusivos e eternize momentos sem limites</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plans Comparison -->
+    <section class="plans-section">
+        <div class="container">
+            <!-- Toggle Billing -->
+            <div class="billing-toggle">
+                <span class="toggle-label">Mensal</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="billingToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label">Anual <span class="save-badge">Economize 17%</span></span>
+            </div>
+
+            <!-- Plans Grid -->
+            <div class="plans-grid">
+                <!-- Basic Plan -->
+                <div class="plan-card basic">
+                    <div class="plan-header">
+                        <div class="plan-icon">🎯</div>
+                        <h3>Básico</h3>
+                        <p class="plan-description">Perfeito para começar</p>
+                    </div>
+                    <div class="plan-price">
+                        <span class="currency">R$</span>
+                        <span class="amount">0</span>
+                        <span class="period">/mês</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>1 evento ativo</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>Até 50 fotos por evento</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>QR Code padrão</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>Galeria pública</span>
+                        </li>
+                        <li class="feature-item disabled">
+                            <span class="feature-icon">✕</span>
+                            <span>Personalização de QR</span>
+                        </li>
+                        <li class="feature-item disabled">
+                            <span class="feature-icon">✕</span>
+                            <span>Download de fotos</span>
+                        </li>
+                        <li class="feature-item disabled">
+                            <span class="feature-icon">✕</span>
+                            <span>Galeria privada</span>
+                        </li>
+                    </ul>
+                    <button class="plan-button basic-button" onclick="window.location.href='register.html'">
+                        Começar Grátis
+                    </button>
+                </div>
+
+                <!-- Premium Monthly Plan -->
+                <div class="plan-card premium featured" id="premiumMonthly">
+                    <div class="featured-badge">Mais Popular</div>
+                    <div class="plan-header">
+                        <div class="plan-icon">👑</div>
+                        <h3>Premium</h3>
+                        <p class="plan-description">Para profissionais e eventos especiais</p>
+                    </div>
+                    <div class="plan-price">
+                        <span class="currency">R$</span>
+                        <span class="amount monthly-price">29</span>
+                        <span class="period">,90/mês</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span><strong>Eventos ilimitados</strong></span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span><strong>Upload ilimitado de fotos</strong></span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span><strong>QR Code personalizado</strong></span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span><strong>Galeria privada</strong></span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>Download de todas as fotos</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>Temas exclusivos</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>Suporte prioritário</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>Sem marca d'água</span>
+                        </li>
+                    </ul>
+                    <button class="plan-button premium-button" onclick="selectPlan('premium-monthly')">
+                        Assinar Premium
+                    </button>
+                    <p class="plan-note">Cancele quando quiser</p>
+                </div>
+
+                <!-- Premium Yearly Plan (Hidden by default) -->
+                <div class="plan-card premium featured" id="premiumYearly" style="display: none;">
+                    <div class="featured-badge">Melhor Custo-Benefício</div>
+                    <div class="plan-header">
+                        <div class="plan-icon">👑</div>
+                        <h3>Premium Anual</h3>
+                        <p class="plan-description">Economize 2 meses</p>
+                    </div>
+                    <div class="plan-price">
+                        <span class="currency">R$</span>
+                        <span class="amount yearly-price">299</span>
+                        <span class="period">,90/ano</span>
+                        <div class="price-note">R$ 24,99/mês</div>
+                    </div>
+                    <ul class="plan-features">
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span><strong>Eventos ilimitados</strong></span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span><strong>Upload ilimitado de fotos</strong></span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span><strong>QR Code personalizado</strong></span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span><strong>Galeria privada</strong></span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>Download de todas as fotos</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>Temas exclusivos</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>Suporte prioritário</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>Sem marca d'água</span>
+                        </li>
+                    </ul>
+                    <button class="plan-button premium-button" onclick="selectPlan('premium-yearly')">
+                        Assinar Premium Anual
+                    </button>
+                    <p class="plan-note">Economize R$ 59,90 por ano</p>
+                </div>
+
+                <!-- Lifetime Plan -->
+                <div class="plan-card lifetime">
+                    <div class="plan-header">
+                        <div class="plan-icon">💎</div>
+                        <h3>Vitalício</h3>
+                        <p class="plan-description">Acesso para sempre</p>
+                    </div>
+                    <div class="plan-price">
+                        <span class="currency">R$</span>
+                        <span class="amount">497</span>
+                        <span class="period">,00</span>
+                        <div class="price-note">Pagamento único</div>
+                    </div>
+                    <ul class="plan-features">
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span><strong>Tudo do Premium</strong></span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span><strong>Acesso vitalício</strong></span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>Atualizações gratuitas</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>Novos recursos incluídos</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>Suporte vitalício</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">✓</span>
+                            <span>Sem mensalidades</span>
+                        </li>
+                    </ul>
+                    <button class="plan-button lifetime-button" onclick="selectPlan('premium-lifetime')">
+                        Comprar Acesso Vitalício
+                    </button>
+                    <p class="plan-note">Melhor investimento a longo prazo</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Comparison -->
+    <section class="features-comparison">
+        <div class="container">
+            <h2>Comparação Detalhada</h2>
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Recursos</th>
+                            <th>Básico</th>
+                            <th>Premium</th>
+                            <th>Vitalício</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Eventos ativos</td>
+                            <td>1</td>
+                            <td>Ilimitado</td>
+                            <td>Ilimitado</td>
+                        </tr>
+                        <tr>
+                            <td>Fotos por evento</td>
+                            <td>50</td>
+                            <td>Ilimitado</td>
+                            <td>Ilimitado</td>
+                        </tr>
+                        <tr>
+                            <td>QR Code personalizado</td>
+                            <td>✕</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Galeria privada</td>
+                            <td>✕</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Download de fotos</td>
+                            <td>✕</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Temas exclusivos</td>
+                            <td>✕</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Suporte prioritário</td>
+                            <td>✕</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Sem marca d'água</td>
+                            <td>✕</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section">
+        <div class="container">
+            <h2>Perguntas Frequentes</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>Posso cancelar a qualquer momento?</h3>
+                    <p>Sim! Você pode cancelar sua assinatura a qualquer momento sem taxas adicionais.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Como funciona o pagamento?</h3>
+                    <p>Aceitamos cartão de crédito, débito, PIX e boleto através do Mercado Pago.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Posso fazer upgrade do plano?</h3>
+                    <p>Sim! Você pode fazer upgrade a qualquer momento e pagar apenas a diferença proporcional.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>O que acontece se eu cancelar?</h3>
+                    <p>Você mantém acesso aos recursos premium até o fim do período pago.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="cta-final">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Pronto Para Começar?</h2>
+                <p>Escolha seu plano e comece a eternizar momentos especiais hoje mesmo</p>
+                <button class="btn btn-primary btn-large" onclick="selectPlan('premium-monthly')">
+                    Assinar Premium Agora
+                </button>
+                <p class="cta-note">✓ Sem compromisso  ✓ Cancele quando quiser  ✓ Suporte dedicado</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>✨ Eternize</h3>
+                    <p>Eternizando momentos especiais desde 2020</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Produto</h4>
+                    <ul>
+                        <li><a href="index.html">Início</a></li>
+                        <li><a href="plans.html">Planos</a></li>
+                        <li><a href="#recursos">Recursos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Suporte</h4>
+                    <ul>
+                        <li><a href="#">Central de Ajuda</a></li>
+                        <li><a href="#">Contato</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contato</h4>
+                    <p>contato@eternize.com.br</p>
+                    <p>(31) 99999-9999</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Eternize. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Processando pagamento...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <script src="js/payment.js"></script>
+</body>
+</html>

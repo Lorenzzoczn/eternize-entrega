@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Eternize</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">✨ Eternize</a>
+                <div class="nav-user">
+                    <span id="userName">Olá, Usuário</span>
+                    <button class="btn-logout" onclick="logout()">Sair</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard -->
+    <section class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <div>
+                    <h1>Meus Eventos</h1>
+                    <p>Gerencie seus álbuns e acompanhe as memórias</p>
+                </div>
+                <button class="btn btn-primary" onclick="openCreateModal()">
+                    + Criar Novo Evento
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📸</div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="totalPhotos">0</span>
+                        <span class="stat-label">Fotos Recebidas</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🎉</div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="totalEvents">0</span>
+                        <span class="stat-label">Eventos Ativos</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="totalContributors">0</span>
+                        <span class="stat-label">Contribuidores</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">💾</div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="storageUsed">0 GB</span>
+                        <span class="stat-label">Armazenamento</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Events Grid -->
+            <div class="events-section">
+                <h2>Seus Eventos</h2>
+                <div class="events-grid" id="eventsGrid">
+                    <!-- Events will be loaded here -->
+                </div>
+
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">📸</div>
+                    <h3>Nenhum evento criado ainda</h3>
+                    <p>Crie seu primeiro evento e comece a eternizar memórias!</p>
+                    <button class="btn btn-primary" onclick="openCreateModal()">
+                        Criar Primeiro Evento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Create Event Modal -->
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Criar Novo Evento</h2>
+                <button class="modal-close" onclick="closeCreateModal()">&times;</button>
+            </div>
+            <form id="createEventForm" class="modal-body">
+                <div class="form-group">
+                    <label for="eventName">Nome do Evento</label>
+                    <input type="text" id="eventName" placeholder="Ex: Casamento Maria & João" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventDate">Data do Evento</label>
+                    <input type="date" id="eventDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventType">Tipo de Evento</label>
+                    <select id="eventType" required>
+                        <option value="">Selecione...</option>
+                        <option value="casamento">Casamento</option>
+                        <option value="aniversario">Aniversário</option>
+                        <option value="formatura">Formatura</option>
+                        <option value="corporativo">Evento Corporativo</option>
+                        <option value="debutante">15 Anos</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventDescription">Descrição (opcional)</label>
+                    <textarea id="eventDescription" rows="3" placeholder="Conte um pouco sobre o evento..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Personalização</label>
+                    <div class="color-picker">
+                        <input type="radio" name="theme" value="rosa" id="themeRosa" checked>
+                        <label for="themeRosa" class="color-option" style="background: #FFD1DC;"></label>
+
+                        <input type="radio" name="theme" value="azul" id="themeAzul">
+                        <label for="themeAzul" class="color-option" style="background: #ADD8E6;"></label>
+
+                        <input type="radio" name="theme" value="menta" id="themeMenta">
+                        <label for="themeMenta" class="color-option" style="background: #98FF98;"></label>
+
+                        <input type="radio" name="theme" value="ouro" id="themeOuro">
+                        <label for="themeOuro" class="color-option" style="background: #E4D9B6;"></label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    Criar Evento
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Event Details Modal -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 id="modalEventName">Evento</h2>
+                <button class="modal-close" onclick="closeEventModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="event-details-grid">
+                    <!-- QR Code Section -->
+                    <div class="qr-section">
+                        <h3>Compartilhar</h3>
+                        <div class="qr-code-display" id="qrCodeDisplay">
+                            <div class="qr-placeholder">
+                                <span style="font-size: 4rem;">📱</span>
+                                <p>QR Code</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-block" onclick="downloadQR()">
+                            Baixar QR Code
+                        </button>
+
+                        <div class="share-link">
+                            <label>Link de Compartilhamento</label>
+                            <div class="link-copy">
+                                <input type="text" id="shareLink" readonly>
+                                <button class="btn-copy" onclick="copyLink()">Copiar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Photos Section -->
+                    <div class="photos-section">
+                        <div class="photos-header">
+                            <h3>Fotos Recebidas</h3>
+                            <div class="photos-actions">
+                                <button class="btn btn-outline" onclick="downloadAllPhotos()">
+                                    Baixar Todas
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="photos-tabs">
+                            <button class="tab-btn active" onclick="filterPhotos('all')">
+                                Todas (<span id="countAll">0</span>)
+                            </button>
+                            <button class="tab-btn" onclick="filterPhotos('pending')">
+                                Pendentes (<span id="countPending">0</span>)
+                            </button>
+                            <button class="tab-btn" onclick="filterPhotos('approved')">
+                                Aprovadas (<span id="countApproved">0</span>)
+                            </button>
+                        </div>
+
+                        <div class="photos-grid" id="photosGrid">
+                            <!-- Photos will be loaded here -->
+                        </div>
+
+                        <div class="empty-photos" id="emptyPhotos">
+                            <p>Nenhuma foto recebida ainda</p>
+                            <small>Compartilhe o QR Code para começar a receber fotos</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

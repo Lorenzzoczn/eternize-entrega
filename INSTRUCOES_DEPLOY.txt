@@ -1,0 +1,226 @@
+═══════════════════════════════════════════════════════════════
+  🚀 ETERNIZE - INSTRUÇÕES DE DEPLOY NO VERCEL
+═══════════════════════════════════════════════════════════════
+
+📋 CHECKLIST PRÉ-DEPLOY
+═══════════════════════════════════════════════════════════════
+
+✅ Todos os arquivos estão na pasta eternize-final
+✅ vercel.json está configurado
+✅ package.json está atualizado
+✅ .gitignore está presente
+✅ README.md está completo
+
+═══════════════════════════════════════════════════════════════
+  MÉTODO 1: DEPLOY VIA CLI (MAIS RÁPIDO)
+═══════════════════════════════════════════════════════════════
+
+1. INSTALAR VERCEL CLI
+   
+   npm i -g vercel
+
+2. ENTRAR NA PASTA
+   
+   cd eternize-final
+
+3. FAZER LOGIN
+   
+   vercel login
+   
+   (Escolha: Continue with GitHub)
+
+4. DEPLOY DE PRODUÇÃO
+   
+   vercel --prod
+
+5. RESPONDER PERGUNTAS:
+   
+   ? Set up and deploy? → Y
+   ? Which scope? → (escolha sua conta)
+   ? Link to existing project? → N
+   ? What's your project's name? → eternize
+   ? In which directory is your code located? → ./
+   ? Want to override the settings? → N
+
+6. AGUARDAR DEPLOY (1-2 minutos)
+
+7. PRONTO! URL SERÁ EXIBIDA:
+   
+   ✅ Production: https://eternize.vercel.app
+
+═══════════════════════════════════════════════════════════════
+  MÉTODO 2: DEPLOY VIA GITHUB (RECOMENDADO)
+═══════════════════════════════════════════════════════════════
+
+1. CRIAR REPOSITÓRIO NO GITHUB
+   
+   a) Acesse: https://github.com/new
+   b) Nome: eternize
+   c) Descrição: Plataforma de álbuns digitais
+   d) Público ou Privado: (sua escolha)
+   e) Clique em "Create repository"
+
+2. ENVIAR CÓDIGO PARA GITHUB
+   
+   cd eternize-final
+   git init
+   git add .
+   git commit -m "Deploy Eternize - Versão completa"
+   git branch -M main
+   git remote add origin https://github.com/SEU-USUARIO/eternize.git
+   git push -u origin main
+
+3. CONECTAR AO VERCEL
+   
+   a) Acesse: https://vercel.com
+   b) Faça login com GitHub
+   c) Clique em "New Project"
+   d) Selecione o repositório "eternize"
+   e) Configure:
+      - Framework Preset: Other
+      - Build Command: (deixe vazio)
+      - Output Directory: .
+      - Install Command: (deixe vazio)
+   f) Clique em "Deploy"
+
+4. AGUARDAR DEPLOY (1-2 minutos)
+
+5. PRONTO! SITE NO AR:
+   
+   ✅ https://eternize.vercel.app
+
+═══════════════════════════════════════════════════════════════
+  MÉTODO 3: DRAG & DROP (MAIS SIMPLES)
+═══════════════════════════════════════════════════════════════
+
+1. ACESSE: https://vercel.com/new
+
+2. ARRASTE A PASTA eternize-final
+
+3. AGUARDE UPLOAD E DEPLOY
+
+4. PRONTO!
+
+═══════════════════════════════════════════════════════════════
+  VERIFICAÇÃO PÓS-DEPLOY
+═══════════════════════════════════════════════════════════════
+
+Teste todas as funcionalidades:
+
+1. LANDING PAGE
+   ✅ Acesse: https://eternize.vercel.app
+   ✅ Verifique se carrega corretamente
+   ✅ Teste botões e links
+
+2. REGISTRO
+   ✅ Acesse: https://eternize.vercel.app/register
+   ✅ Crie uma conta de teste
+   ✅ Verifique redirecionamento
+
+3. LOGIN
+   ✅ Acesse: https://eternize.vercel.app/login
+   ✅ Faça login
+   ✅ Verifique dashboard
+
+4. DASHBOARD
+   ✅ Crie um evento
+   ✅ Verifique QR Code
+   ✅ Copie link de compartilhamento
+
+5. UPLOAD
+   ✅ Abra link em aba anônima
+   ✅ Faça upload de fotos
+   ✅ Verifique envio
+
+6. APROVAÇÃO
+   ✅ Volte ao dashboard
+   ✅ Aprove/rejeite fotos
+   ✅ Teste download
+
+═══════════════════════════════════════════════════════════════
+  CONFIGURAÇÕES ADICIONAIS
+═══════════════════════════════════════════════════════════════
+
+DOMÍNIO PERSONALIZADO:
+1. Vercel Dashboard → Settings → Domains
+2. Add Domain → Digite seu domínio
+3. Configure DNS conforme instruções
+
+ANALYTICS:
+1. Vercel Dashboard → Settings → Analytics
+2. Enable Analytics (gratuito)
+
+VARIÁVEIS DE AMBIENTE (se necessário):
+1. Settings → Environment Variables
+2. Add New → Key/Value
+
+═══════════════════════════════════════════════════════════════
+  ATUALIZAÇÕES FUTURAS
+═══════════════════════════════════════════════════════════════
+
+Se usou GitHub:
+
+1. Faça alterações no código
+2. git add .
+3. git commit -m "Descrição da alteração"
+4. git push
+5. Deploy automático acontece!
+
+Se usou CLI:
+
+1. Faça alterações no código
+2. vercel --prod
+3. Aguarde deploy
+
+═══════════════════════════════════════════════════════════════
+  COMANDOS ÚTEIS
+═══════════════════════════════════════════════════════════════
+
+vercel --prod          → Deploy de produção
+vercel                 → Deploy de preview
+vercel ls              → Listar deployments
+vercel logs            → Ver logs
+vercel rm eternize     → Remover projeto
+vercel help            → Ajuda
+
+═══════════════════════════════════════════════════════════════
+  TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════
+
+PROBLEMA: Build Failed
+SOLUÇÃO: Não há build necessário, verifique vercel.json
+
+PROBLEMA: 404 Not Found
+SOLUÇÃO: Verifique se index.html está na raiz
+
+PROBLEMA: Assets não carregam
+SOLUÇÃO: Verifique paths relativos nos HTML
+
+PROBLEMA: Funcionalidades não funcionam
+SOLUÇÃO: Abra console (F12) e verifique erros
+
+═══════════════════════════════════════════════════════════════
+  SUPORTE
+═══════════════════════════════════════════════════════════════
+
+📖 Documentação: README.md
+📖 Guia de Uso: COMO_USAR.md
+📖 Deploy Detalhado: DEPLOY_VERCEL_AGORA.md
+
+📧 Email: suporte@eternize.com.br
+💬 WhatsApp: (31) 99999-9999
+
+═══════════════════════════════════════════════════════════════
+  PRONTO!
+═══════════════════════════════════════════════════════════════
+
+Seu Eternize está pronto para ser hospedado no Vercel!
+
+Escolha um dos métodos acima e em 2 minutos seu site estará no ar.
+
+Todas as funcionalidades funcionarão perfeitamente para qualquer
+pessoa que acessar a URL do Vercel.
+
+🎉 Boa sorte com seu deploy!
+
+═══════════════════════════════════════════════════════════════

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ Checklist de Deploy - Netlify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 30px;
+            padding: 50px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .emoji-hero {
+            text-align: center;
+            font-size: 5rem;
+            margin-bottom: 2rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            margin-bottom: 3rem;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .checklist-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .checklist-item.checked {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+        }
+
+        .checkbox {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #667eea;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .checklist-item.checked .checkbox {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .item-text {
+            flex: 1;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 40px;
+            background: #e9ecef;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .alert {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 5px solid #28a745;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 5px solid #ffc107;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .emoji-hero {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="emoji-hero">🚀</div>
+        <h1>Checklist de Deploy</h1>
+        <p class="subtitle">Verifique todos os itens antes de fazer deploy no Netlify</p>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar">0%</div>
+        </div>
+
+        <div class="alert alert-warning" id="alertWarning">
+            ⚠️ Complete todos os itens antes de fazer deploy!
+        </div>
+
+        <div class="alert alert-success" id="alertSuccess">
+            ✅ Tudo pronto! Você pode fazer deploy agora!
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">
+                <span>📁</span>
+                Arquivos de Configuração
+            </h2>
+            <ul class="checklist" id="config-checklist">
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">netlify.toml criado</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">_redirects criado</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">.gitignore criado</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">robots.txt criado</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">sitemap.xml criado</div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">
+                <span>🔗</span>
+                Links e Navegação
+            </h2>
+            <ul class="checklist" id="links-checklist">
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Todos os links internos verificados</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Caminhos relativos (sem / no início)</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">CSS e JS carregando corretamente</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">CDN externo funcionando (QRCode.js)</div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">
+                <span>⚙️</span>
+                Funcionalidades
+            </h2>
+            <ul class="checklist" id="features-checklist">
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Upload de fotos funciona</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Galeria exibe fotos</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Link único gera corretamente</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">QR Code gera e baixa</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Página view.html carrega dados</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Login/Registro funciona</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Dashboard carrega</div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">
+                <span>📱</span>
+                Responsividade
+            </h2>
+            <ul class="checklist" id="responsive-checklist">
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Testado em mobile (375px)</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Testado em tablet (768px)</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Testado em desktop (1920px)</div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">
+                <span>🔍</span>
+                SEO e Performance
+            </h2>
+            <ul class="checklist" id="seo-checklist">
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Meta tags configuradas</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Títulos de página únicos</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Sem erros no console</div>
+                </li>
+                <li class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Assets otimizados</div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="actions">
+            <button class="btn" onclick="resetChecklist()">🔄 Resetar</button>
+            <a href="DEPLOY_NETLIFY.md" class="btn btn-success">📖 Ver Guia de Deploy</a>
+            <button class="btn btn-success" onclick="window.open('https://app.netlify.com', '_blank')">
+                🚀 Ir para Netlify
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function toggleCheck(item) {
+            item.classList.toggle('checked');
+            updateProgress();
+            saveProgress();
+        }
+
+        function updateProgress() {
+            const items = document.querySelectorAll('.checklist-item');
+            const checked = document.querySelectorAll('.checklist-item.checked');
+            const percentage = Math.round((checked.length / items.length) * 100);
+            
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = percentage + '%';
+
+            const alertWarning = document.getElementById('alertWarning');
+            const alertSuccess = document.getElementById('alertSuccess');
+
+            if (percentage === 100) {
+                alertWarning.classList.remove('show');
+                alertSuccess.classList.add('show');
+            } else {
+                alertWarning.classList.add('show');
+                alertSuccess.classList.remove('show');
+            }
+        }
+
+        function resetChecklist() {
+            if (confirm('Tem certeza que deseja resetar o checklist?')) {
+                const items = document.querySelectorAll('.checklist-item');
+                items.forEach(item => item.classList.remove('checked'));
+                updateProgress();
+                localStorage.removeItem('eternize_checklist');
+            }
+        }
+
+        function saveProgress() {
+            const items = document.querySelectorAll('.checklist-item');
+            const state = Array.from(items).map(item => item.classList.contains('checked'));
+            localStorage.setItem('eternize_checklist', JSON.stringify(state));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('eternize_checklist');
+            if (saved) {
+                const state = JSON.parse(saved);
+                const items = document.querySelectorAll('.checklist-item');
+                items.forEach((item, index) => {
+                    if (state[index]) {
+                        item.classList.add('checked');
+                    }
+                });
+                updateProgress();
+            }
+        }
+
+        // Carregar progresso salvo
+        window.addEventListener('DOMContentLoaded', loadProgress);
+    </script>
+</body>
+</html>

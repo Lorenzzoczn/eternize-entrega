@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teste de Upload</title>
+</head>
+<body>
+  <h1>Teste de Upload para Firebase</h1>
+
+  <button id="criarAlbum">Criar Álbum</button>
+  <p><strong>Album ID:</strong> <span id="albumId">nenhum</span></p>
+
+  <input type="file" id="foto" accept="image/*" />
+  <button id="enviarFoto">Enviar Foto</button>
+
+  <pre id="resultado"></pre>
+
+  <script>
+    const apiBase = "http://localhost:3000/api";
+    let albumIdAtual = "";
+
+    const albumIdSpan = document.getElementById("albumId");
+    const resultado = document.getElementById("resultado");
+
+    document.getElementById("criarAlbum").addEventListener("click", async () => {
+      try {
+        const resposta = await fetch(`${apiBase}/album`, {
+          method: "POST"
+        });
+
+        const dados = await resposta.json();
+
+        if (!dados.success) {
+          throw new Error(dados.error || "Erro ao criar álbum");
+        }
+
+        albumIdAtual = dados.albumId;
+        albumIdSpan.textContent = albumIdAtual;
+        resultado.textContent = JSON.stringify(dados, null, 2);
+      } catch (erro) {
+        resultado.textContent = "Erro ao criar álbum: " + erro.message;
+      }
+    });
+
+    document.getElementById("enviarFoto").addEventListener("click", async () => {
+      try {
+        const inputFoto = document.getElementById("foto");
+        const arquivo = inputFoto.files[0];
+
+        if (!albumIdAtual) {
+          alert("Crie um álbum antes.");
+          return;
+        }
+
+        if (!arquivo) {
+          alert("Selecione uma imagem.");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", arquivo);
+
+        const resposta = await fetch(`${apiBase}/upload/${albumIdAtual}`, {
+          method: "POST",
+          body: formData
+        });
+
+        const dados = await resposta.json();
+
+        if (!dados.success) {
+          throw new Error(dados.error || "Erro no upload");
+        }
+
+        resultado.textContent = JSON.stringify(dados, null, 2);
+      } catch (erro) {
+        resultado.textContent = "Erro ao enviar foto: " + erro.message;
+      }
+    });
+  </script>
+</body>
+</html>

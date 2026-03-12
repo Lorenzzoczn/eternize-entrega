@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Página - Eternize</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/create.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="create-page">
+        <div class="create-container">
+            <div class="create-header">
+                <a href="index.html" class="back-link">← Voltar</a>
+                <div class="logo-create">✨</div>
+                <h1>Crie Sua Página Eternize</h1>
+                <p>Adicione fotos e textos para criar uma página única e compartilhável</p>
+            </div>
+
+            <!-- Formulário de Informações -->
+            <div class="create-section">
+                <h2>📝 Informações da Página</h2>
+                <div class="form-group">
+                    <label for="pageTitle">Título da Página *</label>
+                    <input type="text" id="pageTitle" placeholder="Ex: Nosso Casamento, Aniversário de 15 Anos..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pageDescription">Descrição</label>
+                    <textarea id="pageDescription" rows="4" placeholder="Conte um pouco sobre este momento especial..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="pageDate">Data do Evento</label>
+                    <input type="date" id="pageDate">
+                </div>
+            </div>
+
+            <!-- Upload de Fotos -->
+            <div class="create-section">
+                <h2>📸 Galeria de Fotos</h2>
+                <p class="section-hint">Adicione fotos para sua página (máximo 10MB por foto)</p>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📸</div>
+                    <h3>Arraste fotos aqui</h3>
+                    <p>ou clique para selecionar</p>
+                    <input type="file" id="fileInput" multiple accept="image/*" hidden>
+                </div>
+
+                <div class="upload-preview" id="uploadPreview"></div>
+                
+                <button class="btn btn-secondary" id="uploadBtn" style="display: none;">
+                    Salvar Fotos
+                </button>
+            </div>
+
+            <!-- Galeria de Fotos Salvas -->
+            <div class="create-section">
+                <div class="gallery-header">
+                    <h3>Fotos Adicionadas</h3>
+                    <span id="photoCount" class="photo-count">0 fotos</span>
+                </div>
+                <div class="gallery-grid" id="galleryGrid">
+                    <div class="gallery-empty">
+                        <div class="empty-icon">📸</div>
+                        <p>Nenhuma foto adicionada ainda</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botão Finalizar -->
+            <div class="create-actions">
+                <button class="btn btn-primary btn-large" id="finishBtn">
+                    ✨ Finalizar e Gerar Link
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/gallery.js"></script>
+    <script src="js/link-generator.js"></script>
+    <script src="js/create.js"></script>
+</body>
+</html>
