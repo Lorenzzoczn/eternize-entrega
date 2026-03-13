@@ -25,8 +25,17 @@ async function activatePlanForEvent({ eventId, planType, paymentId, amount, paye
     }
 
     if (!eventDocRef) {
-        console.warn('⚠️ Evento não encontrado para ativação de plano:', eventId);
-        return;
+        // Pagamento pode ter sido criado pelo server.js (sem Firestore): criar evento com token = eventId para o webhook ativar
+        const eventosRef = db.collection('eventos').doc(eventId);
+        await eventosRef.set({
+            token: eventId,
+            paymentStatus: 'pending',
+            ativo: true,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        }, { merge: true });
+        eventDocRef = eventosRef;
+        eventSnap = await eventosRef.get();
     }
 
     const eventData = eventSnap.data();

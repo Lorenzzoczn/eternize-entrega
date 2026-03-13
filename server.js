@@ -1,13 +1,15 @@
 // ===== ETERNIZE V3 - SERVER FOR HOSTINGER =====
 // Servidor Node.js otimizado para hospedagem na Hostinger
+// Todos os pagamentos são processados via Asaas (PIX, cartão, boleto).
 
 require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, 'server', '.env') });
 const express = require('express');
 const multer = require('multer');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const cors = require('cors');
-const path = require('path');
 const fs = require('fs').promises;
 const sharp = require('sharp');
 
@@ -239,6 +241,53 @@ app.get('/api/events/by-token/:token/plan-status', async (req, res) => {
     } catch (error) {
         console.error('Erro ao verificar plan-status:', error);
         res.json({ hasPlan: false });
+    }
+});
+
+// Criar link de pagamento (100% Asaas: PIX, cartão, boleto)
+app.post('/api/payments/create', async (req, res) => {
+    try {
+        if (!process.env.ASAAS_API_KEY) {
+            return res.status(503).json({
+                success: false,
+                error: 'Pagamentos temporariamente indisponíveis. Configure ASAAS_API_KEY.'
+            });
+        }
+        const createPaymentLink = require('./server/services/asaasService').createPaymentLink;
+        const {
+            planId,
+            planName,
+            description,
+            value,
+            eventId,
+            clientId,
+            customerName,
+            customerEmail
+        } = req.body || {};
+        const numValue = value !== undefined && value !== null && value !== '' ? Number(value) : 497.99;
+        if (Number.isNaN(numValue) || numValue <= 0) {
+            return res.status(400).json({ success: false, error: 'Valor do pagamento é inválido.' });
+        }
+        const name = planName || planId || 'Plano Eternize';
+        const externalRef = eventId || clientId || planId || undefined;
+        const paymentLink = await createPaymentLink({
+            name,
+            description: description || `Pagamento do plano ${name}`,
+            value: numValue,
+            metadata: { externalReference: externalRef }
+        });
+        console.log('✔ pagamento Asaas criado (server.js)', { id: paymentLink.id, externalRef });
+        return res.json({
+            success: true,
+            checkoutUrl: paymentLink.url,
+            payment: { id: paymentLink.id, gateway: 'asaas', checkoutUrl: paymentLink.url }
+        });
+    } catch (error) {
+        console.error('Erro ao criar pagamento Asaas:', error);
+        const msg = error.response && error.response.errors && error.response.errors[0]
+            ? error.response.errors[0].description
+            : (error.message || 'Erro ao criar link de pagamento.');
+        return res.status(500).json({ success: false, error: msg });
     }
 });
 
