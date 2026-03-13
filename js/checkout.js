@@ -202,11 +202,14 @@ async function processPayment(event) {
             planId: selectedPlan,
             planName: `Plano ${plan.name}`,
             description: plan.description,
-            value: plan.price,
+            // valor fixo do checkout: 497,99
+            value: 497.99,
             clientId: clientIdFromUrl || document.getElementById('email').value,
             customerName: document.getElementById('nome').value,
             customerEmail: document.getElementById('email').value,
             customerCpfCnpj: document.getElementById('cpf').value,
+            // força cobrança Asaas como PIX (backend pode usar se aplicável)
+            billingType: 'PIX',
             paymentMethod,
             returnUrl: returnUrlFromUrl || null
         };
@@ -218,6 +221,7 @@ async function processPayment(event) {
         });
 
         const data = await response.json();
+        console.log('Resposta /api/payments/create:', data);
 
         if (!response.ok || !data.success) {
             const msg = data && data.error ? data.error : 'Erro ao criar pagamento. Tente novamente.';
@@ -225,6 +229,9 @@ async function processPayment(event) {
         } else if (data.checkoutUrl) {
             // Redireciona para o checkout do Asaas (inclui PIX/QR dentro do Asaas)
             window.location.href = data.checkoutUrl;
+            return;
+        } else if (data.payment && data.payment.checkoutUrl) {
+            window.location.href = data.payment.checkoutUrl;
             return;
         } else if (data.pix || data.qrCode || data.payload) {
             // Suporte opcional caso backend retorne dados de PIX diretamente
