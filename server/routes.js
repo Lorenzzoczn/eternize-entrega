@@ -45,14 +45,25 @@ async function uploadToFirebase(fileBuffer, fileName, mimeType) {
 }
 
 // ===== ROTA 1: Criar Álbum =====
-router.post('/album', async (req, res) => {
+router.post('/album', async (req, res, next) => {
   try {
     const albumId = uuidv4();
 
+    const now = admin.firestore.FieldValue.serverTimestamp();
+
     await db.collection('albums').doc(albumId).set({
       id: albumId,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      totalPhotos: 0,
+      // relacionamento / dono (opcional, preenchido pelo frontend futuramente)
+      clientId: null,
+      eventId: null,
+      // metadados básicos
+      title: null,
+      description: null,
+      status: 'active', // active | archived | deleted
+      photoCount: 0,
+      totalPhotos: 0, // compatibilidade com código legado
+      createdAt: now,
+      updatedAt: now,
     });
 
     console.log(`✅ Álbum criado no Firestore: ${albumId}`);
@@ -63,15 +74,12 @@ router.post('/album', async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Erro ao criar álbum:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Erro ao criar álbum',
-    });
+    next(error);
   }
 });
 
 // ===== ROTA 2: Upload de Foto =====
-router.post('/upload/:albumId', upload.single('file'), async (req, res) => {
+router.post('/upload/:albumId', upload.single('file'), async (req, res, next) => {
   try {
     const { albumId } = req.params;
     const file = req.file;
@@ -102,19 +110,31 @@ router.post('/upload/:albumId', upload.single('file'), async (req, res) => {
     );
 
     const photoId = uuidv4();
+    const now = admin.firestore.FieldValue.serverTimestamp();
 
     await albumRef.collection('photos').doc(photoId).set({
       id: photoId,
+      albumId,
+      clientId: null,
+      eventId: null,
       url: photoUrl,
       filename: file.originalname,
+      originalName: file.originalname,
+      mimeType: file.mimetype,
+      size: file.size,
       storagePath: fileName,
-      uploadedAt: admin.firestore.FieldValue.serverTimestamp(),
+      approved: true,
+      deleted: false,
+      createdAt: now,
+      updatedAt: now,
+      uploadedAt: now,
     });
 
-    const photosSnap = await albumRef.collection('photos').get();
-
+    // Atualizar contador de fotos do álbum de forma incremental
     await albumRef.update({
-      totalPhotos: photosSnap.size,
+      photoCount: admin.firestore.FieldValue.increment(1),
+      totalPhotos: admin.firestore.FieldValue.increment(1),
+      updatedAt: now,
     });
 
     console.log(`✅ Foto adicionada ao álbum ${albumId} no Firestore`);
@@ -127,15 +147,12 @@ router.post('/upload/:albumId', upload.single('file'), async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Erro no upload:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Erro ao fazer upload',
-    });
+    next(error);
   }
 });
 
 // ===== ROTA 3: Buscar Fotos do Álbum =====
-router.get('/album/:albumId', async (req, res) => {
+router.get('/album/:albumId', async (req, res, next) => {
   try {
     const { albumId } = req.params;
 
@@ -151,7 +168,7 @@ router.get('/album/:albumId', async (req, res) => {
 
     const photosSnap = await albumRef
       .collection('photos')
-      .orderBy('uploadedAt', 'desc')
+      .orderBy('createdAt', 'desc')
       .get();
 
     const photos = photosSnap.docs.map((doc) => ({
@@ -167,19 +184,18 @@ router.get('/album/:albumId', async (req, res) => {
       photos: photos.map((p) => p.url),
       photoDetails: photos,
       createdAt: albumData.createdAt || null,
-      totalPhotos: photos.length,
+      updatedAt: albumData.updatedAt || null,
+      photoCount: albumData.photoCount ?? photos.length,
+      totalPhotos: albumData.totalPhotos ?? photos.length,
     });
   } catch (error) {
     console.error('❌ Erro ao buscar álbum:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Erro ao buscar álbum',
-    });
+    next(error);
   }
 });
 
 // ===== ROTA 4: Listar Todos os Álbuns (Admin) =====
-router.get('/albums', async (req, res) => {
+router.get('/albums', async (req, res, next) => {
   try {
     const albumsSnap = await db
       .collection('albums')
@@ -198,15 +214,12 @@ router.get('/albums', async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Erro ao listar álbuns:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Erro ao listar álbuns',
-    });
+    next(error);
   }
 });
 
 // ===== ROTA 5: Health Check =====
-router.get('/health', async (req, res) => {
+router.get('/health', async (req, res, next) => {
   try {
     const albumsSnap = await db.collection('albums').get();
 
@@ -216,11 +229,15 @@ router.get('/health', async (req, res) => {
       albums: albumsSnap.size,
     });
   } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      error: error.message,
-    });
+    next(error);
   }
 });
+
+// ===== ROTAS DE PAGAMENTO (ASAAS) E WEBHOOKS =====
+const paymentRoutes = require('./routes/payment');
+const webhookRoutes = require('./routes/webhook');
+
+router.use(paymentRoutes);
+router.use('/webhooks', webhookRoutes);
 
 module.exports = router;

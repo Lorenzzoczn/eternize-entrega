@@ -1,19 +1,28 @@
 // ===== SERVIDOR EXPRESS =====
 
+require('dotenv').config();
+
+if (!process.env.ASAAS_API_KEY) {
+  console.warn('⚠️ ASAAS_API_KEY não configurada. Pagamentos Asaas não funcionarão.');
+}
+
 const express = require('express');
 const cors = require('cors');
 const routes = require('./routes');
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map((s) => s.trim()).filter(Boolean)
+  : '*';
+
 // ===== MIDDLEWARES =====
 
-// CORS
+// CORS (usa ALLOWED_ORIGINS do .env)
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true,
 }));
 
@@ -28,7 +37,7 @@ app.use((req, res, next) => {
 });
 
 // ===== ROTAS =====
-
+// Todas as rotas (álbum, upload, health, payments, webhooks) vêm de routes.js
 app.use('/api', routes);
 
 // Rota raiz
@@ -42,6 +51,8 @@ app.get('/', (req, res) => {
       getAlbum: 'GET /api/album/:albumId',
       listAlbums: 'GET /api/albums',
       health: 'GET /api/health',
+      createPayment: 'POST /api/payments/create',
+      webhookAsaas: 'POST /api/webhooks/asaas',
     },
   });
 });
@@ -73,10 +84,10 @@ app.listen(PORT, () => {
   console.log('✨ ========================================');
   console.log('✨ ETERNIZE API - SERVIDOR INICIADO');
   console.log('✨ ========================================');
-  console.log(`🚀 Servidor rodando em: http://localhost:${PORT}`);
+  console.log(`🚀 Servidor: http://localhost:${PORT}`);
   console.log(`📝 Ambiente: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`☁️  S3 Endpoint: ${process.env.S3_ENDPOINT}`);
-  console.log(`📦 Bucket: ${process.env.S3_BUCKET}`);
+  console.log(`🌐 APP_URL: ${process.env.APP_URL || '(não definido)'}`);
+  console.log(`🔑 Asaas: ${process.env.ASAAS_API_KEY ? 'configurado' : 'não configurado'}`);
   console.log('✨ ========================================');
   console.log('');
 });
