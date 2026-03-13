@@ -76,9 +76,34 @@ class ConviteGenerator {
         document.getElementById('zoomIn')?.addEventListener('click', () => this.zoom(10));
         document.getElementById('zoomOut')?.addEventListener('click', () => this.zoom(-10));
 
-        // Download
+        // Download (só após verificar pagamento)
         document.getElementById('downloadPNG')?.addEventListener('click', () => this.downloadPNG());
         document.getElementById('downloadPDF')?.addEventListener('click', () => this.downloadPDF());
+    }
+
+    /** Base URL da API (igual origem ou window.ETERNIZE_API_BASE em produção). */
+    getApiBase() {
+        return (typeof window !== 'undefined' && window.ETERNIZE_API_BASE) || '';
+    }
+
+    /**
+     * Verifica se o evento tem plano pago. Se não tiver, redireciona para checkout e retorna false.
+     * @returns {Promise<boolean>} true se pode baixar, false se redirecionou.
+     */
+    async ensurePaidBeforeDownload() {
+        const token = this.eventData.token;
+        const base = this.getApiBase();
+        try {
+            const res = await fetch(`${base}/api/events/by-token/${encodeURIComponent(token)}/plan-status`);
+            const data = await res.json().catch(() => ({}));
+            if (data.hasPlan) return true;
+        } catch (e) {
+            console.warn('Erro ao verificar plano:', e);
+        }
+        const returnUrl = encodeURIComponent(window.location.href);
+        const checkoutUrl = `${base}/checkout.html?clientId=${encodeURIComponent(token)}&returnUrl=${returnUrl}`;
+        window.location.href = checkoutUrl;
+        return false;
     }
 
     loadEventData() {
@@ -249,28 +274,58 @@ class ConviteGenerator {
         document.getElementById('zoomLevel').textContent = `${this.currentZoom}%`;
     }
 
+    /**
+     * Garante que o QR code seja capturado pelo html2canvas: converte canvas do QR em <img>.
+     * Retorna função para restaurar o QR (chamar após captura).
+     */
+    ensureQRCodeAsImageForCapture() {
+        const qrContainer = document.getElementById('qrcode');
+        if (!qrContainer) return () => {};
+        const canvas = qrContainer.querySelector('canvas');
+        if (!canvas) return () => {};
+        try {
+            const dataUrl = canvas.toDataURL('image/png');
+            const img = document.createElement('img');
+            img.src = dataUrl;
+            img.alt = 'QR Code';
+            img.style.width = canvas.width + 'px';
+            img.style.height = canvas.height + 'px';
+            img.style.display = 'block';
+            qrContainer.innerHTML = '';
+            qrContainer.appendChild(img);
+            return () => {
+                qrContainer.removeChild(img);
+                this.generateQRCode();
+            };
+        } catch (e) {
+            return () => {};
+        }
+    }
+
     async downloadPNG() {
+        const canDownload = await this.ensurePaidBeforeDownload();
+        if (!canDownload) return;
+
         this.showLoading('Gerando PNG...');
 
         try {
             const card = document.getElementById('conviteCard');
-            
-            // Resetar zoom temporariamente
+            const restoreQR = this.ensureQRCodeAsImageForCapture();
+            await new Promise(r => setTimeout(r, 100));
+
             const originalTransform = card.style.transform;
             card.style.transform = 'scale(1)';
 
-            // Gerar imagem com html2canvas
             const canvas = await html2canvas(card, {
-                scale: 3, // Alta qualidade
+                scale: 3,
                 backgroundColor: '#ffffff',
                 logging: false,
                 useCORS: true
             });
 
-            // Restaurar zoom
             card.style.transform = originalTransform;
+            restoreQR();
 
-            // Converter para blob e baixar
             canvas.toBlob((blob) => {
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -278,7 +333,6 @@ class ConviteGenerator {
                 link.download = `convite-${this.eventData.nome.toLowerCase().replace(/\s+/g, '-')}.png`;
                 link.click();
                 URL.revokeObjectURL(url);
-                
                 this.hideLoading();
                 this.showSuccess('PNG baixado com sucesso!');
             }, 'image/png');
@@ -291,16 +345,19 @@ class ConviteGenerator {
     }
 
     async downloadPDF() {
+        const canDownload = await this.ensurePaidBeforeDownload();
+        if (!canDownload) return;
+
         this.showLoading('Gerando PDF...');
 
         try {
             const card = document.getElementById('conviteCard');
-            
-            // Resetar zoom temporariamente
+            const restoreQR = this.ensureQRCodeAsImageForCapture();
+            await new Promise(r => setTimeout(r, 100));
+
             const originalTransform = card.style.transform;
             card.style.transform = 'scale(1)';
 
-            // Gerar imagem com html2canvas
             const canvas = await html2canvas(card, {
                 scale: 3,
                 backgroundColor: '#ffffff',
@@ -308,13 +365,10 @@ class ConviteGenerator {
                 useCORS: true
             });
 
-            // Restaurar zoom
             card.style.transform = originalTransform;
+            restoreQR();
 
-            // Criar PDF
             const { jsPDF } = window.jspdf;
-            
-            // Dimensões baseadas no tamanho selecionado
             let pdfWidth, pdfHeight;
             switch (this.eventData.tamanho) {
                 case 'a5':
@@ -340,11 +394,8 @@ class ConviteGenerator {
                 format: [pdfWidth, pdfHeight]
             });
 
-            // Adicionar imagem ao PDF
             const imgData = canvas.toDataURL('image/png');
             pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-            // Baixar PDF
             pdf.save(`convite-${this.eventData.nome.toLowerCase().replace(/\s+/g, '-')}.pdf`);
 
             this.hideLoading();

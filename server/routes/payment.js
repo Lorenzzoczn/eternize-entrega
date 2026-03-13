@@ -22,7 +22,7 @@ router.get('/plan', (req, res) => {
 
 /**
  * GET /api/events/:eventId/plan-status
- * Verifica se o evento tem plano ativo (pagamento aprovado).
+ * Verifica se o evento tem plano ativo (pagamento aprovado). eventId = ID do documento no Firestore.
  */
 router.get('/events/:eventId/plan-status', async (req, res) => {
   try {
@@ -55,6 +55,45 @@ router.get('/events/:eventId/plan-status', async (req, res) => {
     });
   } catch (error) {
     console.error('Erro ao verificar plan-status:', error);
+    res.status(500).json({ hasPlan: false });
+  }
+});
+
+/**
+ * GET /api/events/by-token/:token/plan-status
+ * Verifica plano pelo token do evento (usado na página de convite).
+ */
+router.get('/events/by-token/:token/plan-status', async (req, res) => {
+  try {
+    const { token } = req.params;
+    const eventsCollections = ['eventos', 'events'];
+    let eventData = null;
+
+    for (const col of eventsCollections) {
+      const snap = await db.collection(col).where('token', '==', token).limit(1).get();
+      if (!snap.empty) {
+        eventData = snap.docs[0].data();
+        break;
+      }
+    }
+
+    if (!eventData) {
+      return res.json({ hasPlan: false, planType: null, planExpiresAt: null });
+    }
+
+    const paymentStatus = eventData.paymentStatus === 'approved';
+    const planExpiresAt = eventData.planExpiresAt || null;
+    const now = new Date();
+    const expired = planExpiresAt && new Date(planExpiresAt) <= now;
+    const hasPlan = paymentStatus && !expired;
+
+    res.json({
+      hasPlan,
+      planType: eventData.planType || null,
+      planExpiresAt: planExpiresAt || null,
+    });
+  } catch (error) {
+    console.error('Erro ao verificar plan-status por token:', error);
     res.status(500).json({ hasPlan: false });
   }
 });
@@ -97,9 +136,25 @@ router.post('/payments/create', async (req, res) => {
 
     const name = planName || planId || 'Pagamento Eternize';
 
-    // externalReference: eventId → clientId → planId
+    // externalReference: eventId → clientId → planId (usado pelo webhook para ativar plano)
     const externalReference =
       eventId || clientId || planId || undefined;
+
+    // Se eventId/clientId for token do evento (ex.: vindo do convite), garantir doc do evento no Firestore para o webhook atualizar
+    const eventToken = eventId || clientId;
+    if (eventToken && typeof eventToken === 'string') {
+      const eventosRef = db.collection('eventos').doc(eventToken);
+      const eventSnap = await eventosRef.get();
+      if (!eventSnap.exists) {
+        await eventosRef.set({
+          token: eventToken,
+          paymentStatus: 'pending',
+          ativo: true,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+    }
 
     const paymentLink = await createPaymentLink({
       name,

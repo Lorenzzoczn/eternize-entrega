@@ -221,6 +221,27 @@ app.get('/api/events/:token', async (req, res) => {
     }
 });
 
+// Status do plano por token (para página de convite: bloquear download até pagamento)
+app.get('/api/events/by-token/:token/plan-status', async (req, res) => {
+    try {
+        const { token } = req.params;
+        if (!isValidToken(token)) {
+            return res.json({ hasPlan: false, planType: null, planExpiresAt: null });
+        }
+        const eventos = await readDB('eventos');
+        const event = eventos.find(e => e.token === token && e.ativo);
+        const hasPlan = !!(event && event.paymentStatus === 'approved');
+        res.json({
+            hasPlan,
+            planType: event?.planType || null,
+            planExpiresAt: event?.planExpiresAt || null
+        });
+    } catch (error) {
+        console.error('Erro ao verificar plan-status:', error);
+        res.json({ hasPlan: false });
+    }
+});
+
 // Upload de foto
 app.post('/api/upload', uploadLimiter, upload.single('photo'), async (req, res) => {
     try {
@@ -467,6 +488,13 @@ app.get('/api/stats/:token', async (req, res) => {
 });
 
 // ===== ROTAS DE PÁGINAS =====
+// Os arquivos HTML públicos ficam na raiz do projeto (não em public), por isso
+// são servidos via rotas explícitas com sendFile, sem usar express.static(__dirname).
+
+// Página inicial
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // Página do evento
 app.get('/evento/:token', async (req, res) => {
@@ -478,9 +506,33 @@ app.get('/memoria/:token', async (req, res) => {
     res.sendFile(path.join(__dirname, 'evento.html'));
 });
 
-// Página inicial
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+// Páginas HTML na raiz do projeto (rotas explícitas para produção)
+app.get('/login.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'login.html'));
+});
+app.get('/register.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'register.html'));
+});
+app.get('/admin.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
+app.get('/create.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'create.html'));
+});
+app.get('/convite.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'convite.html'));
+});
+app.get('/dashboard.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dashboard.html'));
+});
+app.get('/plans.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'plans.html'));
+});
+app.get('/menu.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'menu.html'));
+});
+app.get('/checkout.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'checkout.html'));
 });
 
 // ===== ERROR HANDLING =====
