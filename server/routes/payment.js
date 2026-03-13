@@ -116,6 +116,7 @@ router.post('/payments/create', async (req, res) => {
       customerName,
       customerEmail,
       customerCpfCnpj,
+      returnUrl,
     } = req.body || {};
 
     // Validação do valor
@@ -162,6 +163,7 @@ router.post('/payments/create', async (req, res) => {
       value: numericValue,
       metadata: {
         externalReference,
+        returnUrl: returnUrl || null,
       },
     });
 

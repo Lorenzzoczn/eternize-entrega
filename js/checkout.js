@@ -1,8 +1,17 @@
-// Get plan from URL
+// Get params from URL (fallback para plano premium único)
 const urlParams = new URLSearchParams(window.location.search);
 const selectedPlan = urlParams.get('plan') || 'premium';
+const clientIdFromUrl = urlParams.get('clientId') || null;
+const returnUrlFromUrl = urlParams.get('returnUrl')
+    ? decodeURIComponent(urlParams.get('returnUrl'))
+    : null;
 
-// Plan data
+// API base (localhost vs produção)
+const apiBaseUrl = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000/api'
+    : '/api';
+
+// Plan data (preço premium ajustado para 497,99)
 const plans = {
     basico: {
         name: 'Básico',
@@ -20,7 +29,7 @@ const plans = {
     premium: {
         name: 'Premium',
         description: 'Ideal para casamentos e festas',
-        price: 197,
+        price: 497.99,
         features: [
             '✓ Fotos ilimitadas',
             '✓ Até 3 eventos ativos',
@@ -49,9 +58,9 @@ const plans = {
     }
 };
 
-// Update summary with selected plan
+// Atualiza o resumo com o plano selecionado
 function updateSummary() {
-    const plan = plans[selectedPlan];
+    const plan = plans[selectedPlan] || plans.premium;
     
     document.querySelector('.plan-badge-small').textContent = plan.name;
     document.querySelector('.plan-selected h4').textContent = `Plano ${plan.name}`;
@@ -60,11 +69,12 @@ function updateSummary() {
     const featuresList = document.getElementById('featuresList');
     featuresList.innerHTML = plan.features.map(f => `<li>${f}</li>`).join('');
     
-    document.getElementById('subtotal').textContent = `R$ ${plan.price.toFixed(2).replace('.', ',')}`;
-    document.getElementById('total').textContent = `R$ ${plan.price.toFixed(2).replace('.', ',')}`;
+    const priceText = `R$ ${plan.price.toFixed(2).replace('.', ',')}`;
+    document.getElementById('subtotal').textContent = priceText;
+    document.getElementById('total').textContent = priceText;
 }
 
-// Initialize
+// Inicializar resumo ao carregar a página
 updateSummary();
 
 // Step navigation
@@ -126,36 +136,109 @@ document.querySelectorAll('.payment-method input').forEach(input => {
     });
 });
 
-// Process payment
-function processPayment() {
+// Exibir pagamento PIX (caso o backend passe dados de QR/código)
+function showPixDetails(pixData) {
+    const pixForm = document.getElementById('pixForm');
+    if (!pixForm) return;
+
+    // Forçar seleção do método PIX visualmente
+    const pixRadio = document.getElementById('pix');
+    if (pixRadio) {
+        pixRadio.checked = true;
+        document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('active'));
+        pixRadio.closest('.payment-method')?.classList.add('active');
+    }
+
+    // Container para QRCode
+    let qrContainer = document.getElementById('pixQrCodeContainer');
+    if (!qrContainer) {
+        qrContainer = document.createElement('div');
+        qrContainer.id = 'pixQrCodeContainer';
+        qrContainer.style.marginTop = '20px';
+        qrContainer.style.display = 'flex';
+        qrContainer.style.justifyContent = 'center';
+        pixForm.appendChild(qrContainer);
+    } else {
+        qrContainer.innerHTML = '';
+    }
+
+    // Campo copia-e-cola
+    let copyField = document.getElementById('pixCopyCode');
+    if (!copyField) {
+        copyField = document.createElement('textarea');
+        copyField.id = 'pixCopyCode';
+        copyField.readOnly = true;
+        copyField.style.width = '100%';
+        copyField.style.marginTop = '15px';
+        copyField.style.padding = '10px';
+        pixForm.appendChild(copyField);
+    }
+
+    const payload = pixData.payload || pixData.code || pixData.qrCode || '';
+    copyField.value = payload;
+
+    if (window.QRCode && payload) {
+        new QRCode(qrContainer, {
+            text: payload,
+            width: 200,
+            height: 200
+        });
+    }
+}
+
+// Processar pagamento chamando o backend Asaas
+async function processPayment(event) {
     const paymentMethod = document.querySelector('.payment-method.active input').id;
-    
-    // Show loading
+
     const btn = event.target;
     const originalText = btn.textContent;
     btn.textContent = 'Processando...';
     btn.disabled = true;
-    
-    // Simulate payment processing
-    setTimeout(() => {
-        // Save to localStorage
-        const userData = {
-            nome: document.getElementById('nome').value,
-            email: document.getElementById('email').value,
-            telefone: document.getElementById('telefone').value,
-            plan: selectedPlan,
-            paymentMethod: paymentMethod,
-            purchaseDate: new Date().toISOString()
+
+    try {
+        const plan = plans[selectedPlan] || plans.premium;
+
+        const body = {
+            planId: selectedPlan,
+            planName: `Plano ${plan.name}`,
+            description: plan.description,
+            value: plan.price,
+            clientId: clientIdFromUrl || document.getElementById('email').value,
+            customerName: document.getElementById('nome').value,
+            customerEmail: document.getElementById('email').value,
+            customerCpfCnpj: document.getElementById('cpf').value,
+            paymentMethod,
+            returnUrl: returnUrlFromUrl || null
         };
-        
-        localStorage.setItem('eternize_user', JSON.stringify(userData));
-        
-        // Go to success step
-        nextStep(3);
-        
+
+        const response = await fetch(`${apiBaseUrl}/payments/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            const msg = data && data.error ? data.error : 'Erro ao criar pagamento. Tente novamente.';
+            alert(msg);
+        } else if (data.checkoutUrl) {
+            // Redireciona para o checkout do Asaas (inclui PIX/QR dentro do Asaas)
+            window.location.href = data.checkoutUrl;
+            return;
+        } else if (data.pix || data.qrCode || data.payload) {
+            // Suporte opcional caso backend retorne dados de PIX diretamente
+            showPixDetails(data.pix || data);
+        } else {
+            alert('Pagamento criado, mas não foi retornado um link de checkout válido.');
+        }
+    } catch (error) {
+        console.error('Erro ao processar pagamento:', error);
+        alert('Falha ao processar o pagamento. Tente novamente em alguns instantes.');
+    } finally {
         btn.textContent = originalText;
         btn.disabled = false;
-    }, 2000);
+    }
 }
 
 // Apply coupon

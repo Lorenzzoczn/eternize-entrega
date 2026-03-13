@@ -262,7 +262,8 @@ app.post('/api/payments/create', async (req, res) => {
             eventId,
             clientId,
             customerName,
-            customerEmail
+            customerEmail,
+            returnUrl
         } = req.body || {};
         const numValue = value !== undefined && value !== null && value !== '' ? Number(value) : 497.99;
         if (Number.isNaN(numValue) || numValue <= 0) {
@@ -274,7 +275,10 @@ app.post('/api/payments/create', async (req, res) => {
             name,
             description: description || `Pagamento do plano ${name}`,
             value: numValue,
-            metadata: { externalReference: externalRef }
+            metadata: {
+                externalReference: externalRef,
+                returnUrl: returnUrl || null
+            }
         });
         console.log('✔ pagamento Asaas criado (server.js)', { id: paymentLink.id, externalRef });
         return res.json({

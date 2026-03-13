@@ -129,6 +129,14 @@ async function createPaymentLink({
     externalReference: metadata.externalReference || undefined,
   };
 
+  // Redirecionamento pós-pagamento (usar domínio configurado no Asaas)
+  if (metadata.returnUrl) {
+    body.callback = {
+      successUrl: metadata.returnUrl,
+      autoRedirect: true,
+    };
+  }
+
   const response = await asaasRequest('/paymentLinks', 'POST', body);
 
   return {
