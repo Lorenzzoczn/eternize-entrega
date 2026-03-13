@@ -1,3 +1,6 @@
+// Load environment variables from .env (local dev)
+require('dotenv').config();
+
 // ===== BACKEND API ROUTES =====
 // Express.js routes for token-based system with Firebase integration
 
@@ -9,32 +12,41 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs').promises;
 
+// Centralized middleware
+const errorHandler = require('./middleware/errorHandler');
+
+// Album routes (simple albums API using Firestore + Firebase Storage)
+const albumRoutes = require('./routes');
+
 // Import payment routes
 const paymentRoutes = require('./routes/payment');
 const webhookRoutes = require('./routes/webhook');
 
-// Firebase Admin SDK
-const admin = require('firebase-admin');
-
-// Initialize Firebase Admin
-if (!admin.apps.length) {
-    const serviceAccount = require('./firebase-service-account.json');
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-        storageBucket: process.env.FIREBASE_STORAGE_BUCKET
-    });
-}
-
-const db = admin.firestore();
-const bucket = admin.storage().bucket();
+// Centralized Firebase Admin (single module)
+const { admin, db, bucket } = require('./firebase');
 
 const app = express();
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+
+// CORS configurable via environment variable (default: allow all)
+const corsOrigin = process.env.CORS_ORIGIN || '*';
+app.use(
+  cors({
+    origin: corsOrigin,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static frontend files (HTML, CSS, JS) from parent folder
+// This allows Hostinger Node.js app to serve the full Eternize frontend.
+const staticRoot = path.join(__dirname, '..');
+app.use(express.static(staticRoot));
 
 // Rate limiting
 const uploadLimiter = rateLimit({
@@ -55,7 +67,11 @@ app.use('/api', generalLimiter);
 
 // Mount payment routes
 app.use('/api', paymentRoutes);
-app.use('/api/webhook', webhookRoutes);
+app.use('/api/webhooks', webhookRoutes);
+
+// Mount album routes (album creation, photo upload, album listing)
+// Keeps backward compatibility with existing frontend that uses /album endpoints.
+app.use('/api', albumRoutes);
 
 // Multer configuration for file uploads
 const upload = multer({
@@ -537,23 +553,8 @@ app.get('/memoria/:token', async (req, res) => {
     }
 });
 
-// Error handling middleware
-app.use((error, req, res, next) => {
-    if (error instanceof multer.MulterError) {
-        if (error.code === 'LIMIT_FILE_SIZE') {
-            return res.status(400).json({
-                success: false,
-                error: 'Arquivo muito grande. Máximo 10MB'
-            });
-        }
-    }
-
-    console.error('Unhandled error:', error);
-    res.status(500).json({
-        success: false,
-        error: 'Erro interno do servidor'
-    });
-});
+// Error handling (must be after all routes/middleware)
+app.use(errorHandler);
 
 // Helper function to generate memoria page HTML
 function generateMemoriaPageHTML(event, photos) {

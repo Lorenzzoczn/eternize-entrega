@@ -97,6 +97,20 @@ class TokenDashboard {
 
 const tokenDashboard = new TokenDashboard();
 
+function isEventPremiumActive(event) {
+    if (!event) return false;
+    if (event.paymentStatus !== 'approved') return false;
+
+    if (!event.planExpiresAt) {
+        // Planos sem expiração (ex: vitalício)
+        return true;
+    }
+
+    const now = new Date();
+    const expiresAt = new Date(event.planExpiresAt);
+    return expiresAt > now;
+}
+
 // Initialize dashboard
 function initDashboard() {
     updateStats();
@@ -181,14 +195,21 @@ function getEventIcon(type) {
     return icons[type] || '🎉';
 }
 
-// Create event modal
+// Create event flow
+// Em vez de abrir o modal interno, redireciona para a página de convite
 function openCreateModal() {
-    document.getElementById('createModal').classList.add('active');
+    window.location.href = 'convite.html';
 }
 
 function closeCreateModal() {
-    document.getElementById('createModal').classList.remove('active');
-    document.getElementById('createEventForm').reset();
+    const modal = document.getElementById('createModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+    const form = document.getElementById('createEventForm');
+    if (form) {
+        form.reset();
+    }
 }
 
 // Handle create event form
@@ -235,6 +256,12 @@ function openEvent(eventId) {
     currentEventId = eventId;
     const event = events.find(e => e.id === eventId);
     if (!event) return;
+
+    // Verificar plano antes de permitir acesso completo
+    if (!isEventPremiumActive(event)) {
+        alert('Seu plano ainda não está ativo para este evento.\n\nConclua o pagamento ou aguarde a confirmação para liberar o QR Code e o download de fotos.');
+        return;
+    }
     
     document.getElementById('modalEventName').textContent = event.name || event.nome_evento;
     

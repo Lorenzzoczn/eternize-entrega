@@ -1,71 +1,134 @@
 // ===== WEBHOOK ROUTES =====
-// Rotas para receber notificações do Mercado Pago
+// Notificações de pagamento: apenas ASAAS (Mercado Pago não utilizado)
 
 const express = require('express');
 const router = express.Router();
-const mercadoPagoService = require('../services/mercadoPagoService');
+const { db, admin } = require('../firebase');
 
-// Webhook do Mercado Pago
-router.post('/mercadopago', async (req, res) => {
-    try {
-        console.log('Webhook received:', JSON.stringify(req.body, null, 2));
+// Helper: ativar plano para um evento (idempotente)
+async function activatePlanForEvent({ eventId, planType, paymentId, amount, payerEmail, now }) {
+    console.log('✔ plano ativado (evento):', { eventId, planType, paymentId });
 
-        const webhookData = req.body;
+    const eventsCollections = ['eventos', 'events'];
+    let eventDocRef = null;
+    let eventSnap = null;
 
-        // Processar webhook
-        const result = await mercadoPagoService.processWebhook(webhookData);
-
-        if (result.success) {
-            // Executar ação baseada no resultado
-            if (result.action === 'activate_premium') {
-                await activateUserPremium(result.userId, result.metadata);
-                
-                console.log(`Premium activated for user: ${result.userId}`);
-            } else if (result.action === 'payment_pending') {
-                await updatePaymentStatus(result.userId, 'pending');
-                
-                console.log(`Payment pending for user: ${result.userId}`);
-            }
-
-            // Sempre retornar 200 para o Mercado Pago
-            res.status(200).json({ success: true });
-        } else {
-            console.error('Webhook processing error:', result.error);
-            res.status(200).json({ success: true }); // Retornar 200 mesmo com erro
+    // Procurar o evento na coleção atual (prioriza "eventos" para compatibilidade)
+    for (const col of eventsCollections) {
+        const ref = db.collection(col).doc(eventId);
+        const snap = await ref.get();
+        if (snap.exists) {
+            eventDocRef = ref;
+            eventSnap = snap;
+            break;
         }
-
-    } catch (error) {
-        console.error('Webhook error:', error);
-        // Sempre retornar 200 para evitar reenvios desnecessários
-        res.status(200).json({ success: true });
     }
-});
 
-// Função para ativar premium do usuário
+    if (!eventDocRef) {
+        console.warn('⚠️ Evento não encontrado para ativação de plano:', eventId);
+        return;
+    }
+
+    const eventData = eventSnap.data();
+
+    // Idempotência: se já estiver aprovado com o mesmo plano e paymentId, não faz nada
+    if (
+        eventData.paymentStatus === 'approved' &&
+        eventData.planType === planType &&
+        eventData.lastPaymentId === paymentId
+    ) {
+        console.log('ℹ️ Plano já ativo para este evento. Nenhuma ação necessária.');
+        return;
+    }
+
+    // Calcular expiração do plano
+    let planExpiresAt = null;
+    const baseDate = new Date(now);
+
+    if (planType === 'premium-monthly') {
+        baseDate.setMonth(baseDate.getMonth() + 1);
+        planExpiresAt = baseDate.toISOString();
+    } else if (planType === 'premium-yearly') {
+        baseDate.setFullYear(baseDate.getFullYear() + 1);
+        planExpiresAt = baseDate.toISOString();
+    } else if (planType === 'premium-lifetime') {
+        planExpiresAt = null;
+    }
+
+    const updatePayload = {
+        paymentStatus: 'approved',
+        planType,
+        planActivatedAt: now.toISOString(),
+        planExpiresAt,
+        lastPaymentId: paymentId,
+        lastPaymentAmount: amount,
+        lastPaymentPayerEmail: payerEmail || null,
+        updatedAt: now
+    };
+
+    await eventDocRef.set(updatePayload, { merge: true });
+
+    console.log('✅ Evento atualizado com informações de plano:', {
+        eventId,
+        planType,
+        planExpiresAt
+    });
+
+    // Atualizar / criar subscription vinculada ao evento
+    const subscriptionRef = db.collection('subscriptions').doc(eventId);
+    const subscriptionSnap = await subscriptionRef.get();
+
+    const subscriptionData = {
+        id: eventId,
+        eventId,
+        clientId: eventData.clientId || null,
+        status: 'active',
+        planType,
+        provider: 'asaas',
+        currentPeriodEnd: planExpiresAt,
+        updatedAt: now
+    };
+
+    if (!subscriptionSnap.exists) {
+        subscriptionData.createdAt = now;
+    }
+
+    await subscriptionRef.set(subscriptionData, { merge: true });
+
+    console.log('✅ Subscription atualizada/criada para evento:', {
+        eventId,
+        planType,
+        currentPeriodEnd: planExpiresAt
+    });
+}
+
+
+// Função para ativar premium do usuário (persistindo no Firestore)
 async function activateUserPremium(userId, metadata) {
     try {
+        const now = new Date();
+
         // Determinar tipo de plano
         const planType = metadata?.plan_type || 'premium-monthly';
         let expirationDate = null;
 
         // Calcular data de expiração
         if (planType === 'premium-monthly') {
-            expirationDate = new Date();
+            expirationDate = new Date(now);
             expirationDate.setMonth(expirationDate.getMonth() + 1);
         } else if (planType === 'premium-yearly') {
-            expirationDate = new Date();
+            expirationDate = new Date(now);
             expirationDate.setFullYear(expirationDate.getFullYear() + 1);
         } else if (planType === 'premium-lifetime') {
             expirationDate = null; // Sem expiração
         }
 
-        // Atualizar no localStorage (fallback) ou banco de dados
         const userData = {
-            userId: userId,
+            userId,
             plan: 'premium',
-            planType: planType,
+            planType,
             paymentStatus: 'approved',
-            activatedAt: new Date().toISOString(),
+            activatedAt: now.toISOString(),
             expiresAt: expirationDate ? expirationDate.toISOString() : null,
             features: {
                 unlimitedEvents: true,
@@ -73,20 +136,20 @@ async function activateUserPremium(userId, metadata) {
                 privateGallery: true,
                 downloadPhotos: true,
                 prioritySupport: true
-            }
+            },
+            updatedAt: now
         };
 
-        // Salvar no banco de dados (implementar conforme seu banco)
-        // await db.collection('users').doc(userId).update(userData);
+        const userRef = db.collection('users').doc(userId);
+        const snap = await userRef.get();
 
-        // Salvar no localStorage como fallback
-        if (typeof localStorage !== 'undefined') {
-            const users = JSON.parse(localStorage.getItem('eternize_premium_users')) || {};
-            users[userId] = userData;
-            localStorage.setItem('eternize_premium_users', JSON.stringify(users));
+        if (!snap.exists) {
+            userData.createdAt = now;
         }
 
-        console.log('User premium activated:', userData);
+        await userRef.set(userData, { merge: true });
+
+        console.log('User premium activated (Firestore):', { userId, planType });
         return { success: true, userData };
 
     } catch (error) {
@@ -95,19 +158,20 @@ async function activateUserPremium(userId, metadata) {
     }
 }
 
-// Função para atualizar status de pagamento
+// Função para atualizar status de pagamento (Firestore)
 async function updatePaymentStatus(userId, status) {
     try {
+        const now = new Date();
         const statusData = {
-            userId: userId,
+            userId,
             paymentStatus: status,
-            updatedAt: new Date().toISOString()
+            updatedAt: now.toISOString()
         };
 
-        // Atualizar no banco de dados
-        // await db.collection('users').doc(userId).update(statusData);
+        const userRef = db.collection('users').doc(userId);
+        await userRef.set(statusData, { merge: true });
 
-        console.log('Payment status updated:', statusData);
+        console.log('Payment status updated (Firestore):', statusData);
         return { success: true };
 
     } catch (error) {
@@ -152,14 +216,9 @@ router.get('/check-premium/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
 
-        // Buscar do banco de dados ou localStorage
-        let userData = null;
-
-        // Tentar buscar do localStorage (fallback)
-        if (typeof localStorage !== 'undefined') {
-            const users = JSON.parse(localStorage.getItem('eternize_premium_users')) || {};
-            userData = users[userId];
-        }
+        const userRef = db.collection('users').doc(userId);
+        const snap = await userRef.get();
+        const userData = snap.exists ? snap.data() : null;
 
         if (userData) {
             // Verificar se o plano expirou
@@ -197,6 +256,134 @@ router.get('/check-premium/:userId', async (req, res) => {
             success: false,
             error: error.message
         });
+    }
+});
+
+// ===== WEBHOOK ASAAS =====
+// POST /api/webhooks/asaas
+// Compatível com estrutura atual: atualiza Firestore (payments/pagamentos, eventos, subscriptions)
+
+router.post('/asaas', async (req, res) => {
+    try {
+        // Estrutura típica do webhook Asaas:
+        // {
+        //   "id": "evt_xxx",
+        //   "event": "PAYMENT_RECEIVED",
+        //   "dateCreated": "2024-06-12 16:45:03",
+        //   "payment": { ... }
+        // }
+        const { event, payment } = req.body || {};
+
+        if (!event || !payment || !payment.id) {
+            console.warn('⚠️ Webhook Asaas inválido ou incompleto. Ignorando.');
+            return res.status(200).json({ success: true, ignored: true });
+        }
+
+        const paymentId = String(payment.id);
+        console.log('✔ webhook recebido (Asaas)', { event, paymentId });
+        const status = payment.status || null; // e.g. "PENDING", "CONFIRMED", "RECEIVED"
+        const value = payment.value || null;
+        const customer = payment.customer || {};
+        const billingType = payment.billingType || null;
+
+        // externalReference é onde podemos vincular ao nosso domínio (eventId, userId, etc.)
+        const externalReference = payment.externalReference || null;
+
+        const now = new Date();
+
+        // 1) Atualizar coleção "pagamentos" (nova estrutura Asaas)
+        const pagamentosRef = db.collection('pagamentos').doc(`asaas_${paymentId}`);
+        await pagamentosRef.set(
+            {
+                id: `asaas_${paymentId}`,
+                gateway: 'asaas',
+                asaasPaymentId: paymentId,
+                status: status ? status.toLowerCase() : null,
+                value,
+                billingType,
+                externalReference,
+                customer: {
+                    id: customer.id || null,
+                    name: customer.name || null,
+                    email: customer.email || null,
+                    cpfCnpj: customer.cpfCnpj || null
+                },
+                raw: payment,
+                updatedAt: admin.firestore.FieldValue.serverTimestamp()
+            },
+            { merge: true }
+        );
+
+        // 2) Atualizar coleção "payments" (mesmo ID que payment.js: asaas_${paymentId})
+        const legacyPaymentRef = db.collection('payments').doc(`asaas_${paymentId}`);
+        await legacyPaymentRef.set(
+            {
+                paymentId,
+                status: status ? status.toLowerCase() : null,
+                transactionAmount: value,
+                externalReference,
+                provider: 'asaas',
+                updatedAt: now
+            },
+            { merge: true }
+        );
+
+        // 3) Se pagamento foi realmente recebido/confirmado, ativar plano/evento/assinatura
+        const isPaid =
+            event === 'PAYMENT_RECEIVED' ||
+            status === 'RECEIVED' ||
+            status === 'CONFIRMED';
+
+        if (isPaid) {
+            try {
+                const ref = externalReference || null;
+                const pagamentoSnap = await pagamentosRef.get();
+                const pagamento = pagamentoSnap.exists ? pagamentoSnap.data() : {};
+
+                if (ref) {
+                    let handled = false;
+                    const eventsCollections = ['eventos', 'events'];
+
+                    for (const col of eventsCollections) {
+                        const eventDocRef = db.collection(col).doc(ref);
+                        const eventSnap = await eventDocRef.get();
+                        if (eventSnap.exists) {
+                            const eventData = eventSnap.data();
+                            const planType =
+                                pagamento.planId ||
+                                eventData.planType ||
+                                'premium-monthly';
+
+                            await activatePlanForEvent({
+                                eventId: ref,
+                                planType,
+                                paymentId,
+                                amount: value,
+                                payerEmail: customer.email || null,
+                                now
+                            });
+
+                            handled = true;
+                            break;
+                        }
+                    }
+
+                    if (!handled) {
+                        await activateUserPremium(ref, {
+                            plan_type: pagamento.planId || 'premium-monthly'
+                        });
+                        await updatePaymentStatus(ref, 'approved');
+                    }
+                }
+            } catch (activationError) {
+                console.error('✔ erro Asaas (ativar plano):', activationError.message || activationError);
+            }
+        }
+
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        console.error('✔ erro Asaas (webhook):', error.message || error);
+        return res.status(200).json({ success: true });
     }
 });
 
