@@ -522,7 +522,14 @@ app.post('/api/upload', uploadLimiter, upload.single('photo'), async (req, res) 
 
         const fotos = await readDB('fotos');
         fotos.push(photoData);
-        await writeDB('fotos', fotos);
+        const saved = await writeDB('fotos', fotos);
+        if (!saved) {
+            console.error('Falha ao salvar registro em data/fotos.json');
+            return res.status(500).json({
+                success: false,
+                error: 'Erro ao salvar. Tente novamente.'
+            });
+        }
 
         res.json({
             success: true,
@@ -555,13 +562,19 @@ app.get('/api/photos/:token', async (req, res) => {
         let photos = fotos.filter(f => f.token === token);
 
         if (approved !== undefined) {
-            const isApproved = approved === 'true';
-            photos = photos.filter(f => f.aprovado === isApproved);
+            const isApproved = approved === 'true' || approved === true;
+            photos = photos.filter(f => {
+                const a = f.aprovado;
+                return isApproved ? (a === true || a === 'true' || a === 1) : (a !== true && a !== 'true' && a !== 1);
+            });
         }
 
         // Ordenar por data (mais recentes primeiro)
         photos.sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em));
 
+        // Evitar cache para a galeria sempre mostrar fotos/vídeos atualizados
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
         res.json({
             success: true,
             photos: photos

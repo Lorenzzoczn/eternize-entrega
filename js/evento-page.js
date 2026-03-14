@@ -347,7 +347,8 @@ class EventoPage {
         document.getElementById('uploadForm').style.display = 'none';
         document.getElementById('uploadSuccess').style.display = 'block';
 
-        // Recarregar galeria
+        // Recarregar galeria com pequeno delay para o servidor persistir e sem cache
+        await new Promise(r => setTimeout(r, 400));
         await this.loadPhotos();
     }
 
@@ -363,12 +364,17 @@ class EventoPage {
     }
 
     async loadPhotos() {
+        if (!this.eventToken) return;
         try {
-            const response = await fetch(`/api/photos/${this.eventToken}?approved=true`);
+            const url = `/api/photos/${this.eventToken}?approved=true`;
+            const response = await fetch(url, {
+                cache: 'no-store',
+                headers: { 'Cache-Control': 'no-cache' }
+            });
             const data = await response.json();
 
             if (data.success) {
-                this.photos = data.photos;
+                this.photos = Array.isArray(data.photos) ? data.photos : [];
                 this.renderGallery();
                 this.updateStats();
             }
