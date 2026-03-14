@@ -348,6 +348,32 @@ app.delete('/api/events/:token', async (req, res) => {
     }
 });
 
+// Listar todos os eventos (para dashboard/admin em qualquer aparelho)
+app.get('/api/admin/events', async (req, res) => {
+    try {
+        const eventos = await readDB('eventos');
+        const fotos = await readDB('fotos');
+        const ativos = (eventos || []).filter(e => e.ativo !== false);
+        // Normalizar para o dashboard (name/date) e incluir contagem de fotos
+        const list = ativos.map(e => {
+            const eventFotos = (fotos || []).filter(f => f.token === e.token);
+            return {
+                ...e,
+                name: e.nome_evento || e.name,
+                date: e.data_evento || e.date,
+                theme: e.tema || e.theme,
+                nome_evento: e.nome_evento,
+                data_evento: e.data_evento,
+                photoCount: eventFotos.length
+            };
+        });
+        res.json({ success: true, events: list });
+    } catch (error) {
+        console.error('Erro ao listar eventos:', error);
+        res.status(500).json({ success: false, error: 'Erro ao listar eventos' });
+    }
+});
+
 // Status do plano por token (para página de convite: bloquear download até pagamento)
 app.get('/api/events/by-token/:token/plan-status', async (req, res) => {
     try {
@@ -487,7 +513,7 @@ app.post('/api/upload', uploadLimiter, upload.single('photo'), async (req, res) 
             uploaded_by: sanitizeInput(uploaded_by, 50),
             message: sanitizeInput(message, 200),
             criado_em: new Date().toISOString(),
-            aprovado: false // Requer aprovação do admin
+            aprovado: true // Visível para todos assim que enviada; criador pode excluir se não gostar
         };
 
         const fotos = await readDB('fotos');
@@ -581,10 +607,11 @@ app.patch('/api/photos/:photoId/approve', async (req, res) => {
     }
 });
 
-// Deletar foto
+// Deletar foto (apenas quem tem o token do evento = criador/admin pode excluir)
 app.delete('/api/photos/:photoId', async (req, res) => {
     try {
         const { photoId } = req.params;
+        const token = req.query.token || (req.body && req.body.token);
 
         const fotos = await readDB('fotos');
         const photoIndex = fotos.findIndex(f => f.id === photoId);
@@ -597,6 +624,14 @@ app.delete('/api/photos/:photoId', async (req, res) => {
         }
 
         const photo = fotos[photoIndex];
+
+        // Exigir token do evento para autorizar exclusão (criador do evento)
+        if (!token || token !== photo.token) {
+            return res.status(403).json({
+                success: false,
+                error: 'Apenas o criador do evento pode excluir fotos. Informe o token do evento.'
+            });
+        }
 
         // Deletar arquivos
         try {

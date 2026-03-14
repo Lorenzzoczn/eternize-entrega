@@ -50,7 +50,13 @@ class TokenDashboard {
             if (response.ok) {
                 const result = await response.json();
                 if (result.success) {
-                    return result.event;
+                    const e = result.event;
+                    return {
+                        ...e,
+                        name: e.nome_evento || e.name,
+                        date: e.data_evento || e.date,
+                        theme: e.tema || e.theme
+                    };
                 }
             }
             throw new Error('API failed');
@@ -121,10 +127,14 @@ function initDashboard() {
 function updateStats() {
     let totalPhotos = 0;
     let totalContributors = 0;
-    
+
     events.forEach(event => {
-        const photos = JSON.parse(localStorage.getItem(`event_${event.id}_photos`)) || [];
-        totalPhotos += photos.length;
+        if (event.photoCount !== undefined) {
+            totalPhotos += event.photoCount;
+        } else {
+            const photos = JSON.parse(localStorage.getItem(`event_${event.id}_photos`)) || [];
+            totalPhotos += photos.length;
+        }
         totalContributors += event.contributors || 0;
     });
     
@@ -149,8 +159,8 @@ function renderEvents() {
     emptyState.classList.remove('show');
     
     eventsGrid.innerHTML = events.map(event => {
-        const photos = JSON.parse(localStorage.getItem(`event_${event.id}_photos`)) || [];
-        const eventDate = new Date(event.date);
+        const eventDate = new Date(event.date || event.data_evento);
+        const photoCount = event.photoCount !== undefined ? event.photoCount : (JSON.parse(localStorage.getItem(`event_${event.id}_photos`)) || []).length;
         const formattedDate = eventDate.toLocaleDateString('pt-BR', { 
             day: '2-digit', 
             month: 'long', 
@@ -159,17 +169,17 @@ function renderEvents() {
         
         return `
             <div class="event-card" onclick="openEvent('${event.id}')">
-                <div class="event-cover theme-${event.theme}">
+                <div class="event-cover theme-${event.theme || event.tema || 'neutro'}">
                     ${getEventIcon(event.type)}
                     <span class="event-status active">● Ativo</span>
                 </div>
                 <div class="event-info">
-                    <h3>${event.name}</h3>
+                    <h3>${event.name || event.nome_evento}</h3>
                     <p class="event-date">📅 ${formattedDate}</p>
                     <div class="event-stats">
                         <div class="event-stat">
                             <span>📸</span>
-                            <span>${photos.length} fotos</span>
+                            <span>${photoCount} fotos</span>
                         </div>
                         <div class="event-stat">
                             <span>👥</span>
@@ -420,7 +430,7 @@ async function deletePhoto(photoId) {
     const event = events.find(e => e.id === currentEventId);
     if (event && event.token) {
         try {
-            const res = await fetch(`/api/photos/${photoId}`, { method: 'DELETE' });
+            const res = await fetch(`/api/photos/${photoId}?token=${encodeURIComponent(event.token)}`, { method: 'DELETE' });
             if (res.ok) await loadEventPhotos(currentEventId);
         } catch (err) {
             console.error(err);

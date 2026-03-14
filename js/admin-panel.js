@@ -438,29 +438,29 @@ class AdminPanel {
 
     async deletePhoto(photoId) {
         if (!confirm('Tem certeza que deseja deletar esta foto?')) return;
+        const token = this.currentEvent?.token;
+        if (!token) {
+            this.showError('Token do evento não encontrado');
+            return;
+        }
 
         try {
-            // Try API first
-            const response = await fetch(`/api/photos/${photoId}`, {
+            // Try API first (token obrigatório: apenas criador pode excluir)
+            const response = await fetch(`/api/photos/${photoId}?token=${encodeURIComponent(token)}`, {
                 method: 'DELETE'
             });
 
             if (response.ok) {
-                // Remove from local data
                 this.currentPhotos = this.currentPhotos.filter(p => p.id !== photoId);
                 this.updatePhotoCounts();
                 this.renderEventPhotos();
                 this.showSuccess('Foto deletada! 🗑️');
             } else {
-                throw new Error('API error');
+                const data = await response.json().catch(() => ({}));
+                this.showError(data.error || 'Não foi possível excluir a foto.');
             }
         } catch (error) {
-            // Fallback to localStorage
-            this.currentPhotos = this.currentPhotos.filter(p => p.id !== photoId);
-            localStorage.setItem(`event_${this.currentEvent.token}_photos`, JSON.stringify(this.currentPhotos));
-            this.updatePhotoCounts();
-            this.renderEventPhotos();
-            this.showSuccess('Foto deletada localmente! 🗑️');
+            this.showError(error.message || 'Erro ao excluir foto.');
         }
     }
 

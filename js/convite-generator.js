@@ -352,27 +352,41 @@ class ConviteGenerator {
 
     /**
      * Garante que o QR code seja capturado pelo html2canvas: converte canvas do QR em <img>.
-     * Retorna função para restaurar o QR (chamar após captura).
+     * Aguarda o canvas estar desenhado e a imagem carregar para o download incluir o QR.
+     * Retorna Promise<restoreFn> para chamar após a captura.
      */
-    ensureQRCodeAsImageForCapture() {
+    async ensureQRCodeAsImageForCapture() {
         const qrContainer = document.getElementById('qrcode');
         if (!qrContainer) return () => {};
-        const canvas = qrContainer.querySelector('canvas');
-        if (!canvas) return () => {};
+        let canvas = qrContainer.querySelector('canvas');
+        // QRCode.js pode desenhar de forma assíncrona: esperar o canvas ter conteúdo
+        if (!canvas || canvas.width === 0) {
+            await new Promise(r => setTimeout(r, 250));
+            canvas = qrContainer.querySelector('canvas');
+        }
+        if (!canvas || canvas.width === 0) return () => {};
         try {
             const dataUrl = canvas.toDataURL('image/png');
             const img = document.createElement('img');
-            img.src = dataUrl;
             img.alt = 'QR Code';
             img.style.width = canvas.width + 'px';
             img.style.height = canvas.height + 'px';
             img.style.display = 'block';
             qrContainer.innerHTML = '';
             qrContainer.appendChild(img);
-            return () => {
-                qrContainer.removeChild(img);
-                this.generateQRCode();
+            await new Promise((resolve, reject) => {
+                img.onload = () => resolve();
+                img.onerror = () => resolve();
+                img.src = dataUrl;
+                if (img.complete) resolve();
+            });
+            const restore = () => {
+                if (qrContainer.contains(img)) {
+                    qrContainer.removeChild(img);
+                    this.generateQRCode();
+                }
             };
+            return restore;
         } catch (e) {
             return () => {};
         }
@@ -387,8 +401,8 @@ class ConviteGenerator {
 
         try {
             const card = document.getElementById('conviteCard');
-            const restoreQR = this.ensureQRCodeAsImageForCapture();
-            await new Promise(r => setTimeout(r, 100));
+            const restoreQR = await this.ensureQRCodeAsImageForCapture();
+            await new Promise(r => setTimeout(r, 300));
 
             const originalTransform = card.style.transform;
             card.style.transform = 'scale(1)';
@@ -430,8 +444,8 @@ class ConviteGenerator {
 
         try {
             const card = document.getElementById('conviteCard');
-            const restoreQR = this.ensureQRCodeAsImageForCapture();
-            await new Promise(r => setTimeout(r, 100));
+            const restoreQR = await this.ensureQRCodeAsImageForCapture();
+            await new Promise(r => setTimeout(r, 300));
 
             const originalTransform = card.style.transform;
             card.style.transform = 'scale(1)';
