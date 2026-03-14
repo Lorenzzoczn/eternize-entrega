@@ -353,16 +353,16 @@ function renderPhotos(photos, filter = 'all') {
     photosGrid.style.display = 'grid';
     emptyPhotos.classList.remove('show');
     
-    const isVideo = (p) => p.mediaType === 'video' || /\.(mp4|webm|mov|ogg)(\?|$)/i.test(p.url || '');
+    const isVideo = (p) => p.mediaType === 'video' || /\.(mp4|webm|mov|ogg)(\?|$)/i.test((p.url || '').split('?')[0]);
     photosGrid.innerHTML = filteredPhotos.map(photo => {
         const safeId = (photo.id || '').replace(/'/g, "\\'");
         const video = isVideo(photo);
-        const thumb = video ? '' : `<img src="${photo.url || photo.thumbnail || 'https://via.placeholder.com/300'}" alt="Mídia do evento">`;
-        const videoPlaceholder = video ? '<div class="photo-item-video-placeholder"><span class="photo-item-video-icon">🎬</span><span>Vídeo</span></div>' : '';
+        const thumb = video
+            ? `<video src="${photo.url}" muted playsinline preload="metadata" class="photo-item-video-thumb"></video><span class="photo-item-video-badge">Vídeo</span>`
+            : `<img src="${photo.url || photo.thumbnail || 'https://via.placeholder.com/300'}" alt="Mídia do evento">`;
         return `
-        <div class="photo-item">
+        <div class="photo-item ${video ? 'photo-item-is-video' : ''}">
             ${thumb}
-            ${videoPlaceholder}
             <span class="photo-status ${photo.status}">${photo.status === 'pending' ? 'Pendente' : 'Aprovada'}</span>
             <div class="photo-actions">
                 ${photo.status !== 'approved' ? `<button type="button" class="btn-photo-action btn-approve" onclick="approvePhoto('${safeId}')" title="Aprovar">✓ Aprovar</button>` : ''}
