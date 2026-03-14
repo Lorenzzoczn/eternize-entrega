@@ -95,6 +95,70 @@ class ConviteGenerator {
         return true;
     }
 
+    /**
+     * Persiste o evento/convite no dashboard (localStorage eternize_events) para que
+     * o cliente veja o evento salvo ao voltar ao dashboard e possa acessar QR/link/convite.
+     */
+    saveEventToDashboard() {
+        const events = JSON.parse(localStorage.getItem('eternize_events')) || [];
+        const existing = events.find(e => e.token === this.eventData.token);
+        const dateInput = document.getElementById('eventoData');
+        const dataEvento = (dateInput && dateInput.value) ? dateInput.value : this.getDateInputValue(this.eventData.data);
+
+        const eventPayload = {
+            id: existing ? existing.id : `event_${Date.now()}`,
+            token: this.eventData.token,
+            name: this.eventData.nome,
+            nome_evento: this.eventData.nome,
+            date: dataEvento,
+            data_evento: dataEvento,
+            type: existing ? (existing.type || 'outro') : 'outro',
+            theme: existing ? (existing.theme || 'neutro') : 'neutro',
+            description: existing ? (existing.description || '') : '',
+            cores: {
+                primaria: this.eventData.corPrincipal || '#E4D9B6',
+                secundaria: this.eventData.corSecundaria || '#FFD1DC'
+            },
+            createdAt: existing ? existing.createdAt : new Date().toISOString(),
+            contributors: existing ? (existing.contributors || 0) : 0,
+            url_memoria: `${window.location.origin}/memoria/${this.eventData.token}`,
+            conviteCriado: true,
+            conviteCriadoEm: new Date().toISOString()
+        };
+
+        if (!existing) {
+            events.push(eventPayload);
+        } else {
+            const idx = events.findIndex(e => e.token === this.eventData.token);
+            events[idx] = { ...existing, ...eventPayload };
+        }
+
+        localStorage.setItem('eternize_events', JSON.stringify(events));
+        localStorage.setItem('currentEvent', JSON.stringify({
+            id: eventPayload.id,
+            token: this.eventData.token,
+            nome_evento: this.eventData.nome,
+            data_evento: dataEvento,
+            name: this.eventData.nome,
+            date: dataEvento,
+            url_memoria: eventPayload.url_memoria
+        }));
+
+        // Garantir evento na API para que /memoria/:token carregue a página bonita com dados
+        const base = this.getApiBase();
+        fetch(`${base}/api/events/from-convite`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                token: this.eventData.token,
+                nome_evento: this.eventData.nome,
+                data_evento: dataEvento,
+                tema: eventPayload.theme || 'neutro',
+                cores: eventPayload.cores
+            })
+        }).catch(() => {});
+    }
+
     loadEventData() {
         // Carregar dados do evento do localStorage ou URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -123,20 +187,43 @@ class ConviteGenerator {
 
     async fetchEventData(token) {
         try {
-            const response = await fetch(`/api/events/${token}`);
+            const response = await fetch(`${this.getApiBase()}/api/events/${token}`);
             if (response.ok) {
                 const data = await response.json();
-                if (data.success) {
-                    this.eventData.nome = data.event.nome_evento;
-                    this.eventData.data = this.formatDate(new Date(data.event.data_evento));
-                    this.eventData.token = data.event.token;
-                    this.loadEventData();
+                if (data.success && data.event) {
+                    this.eventData.nome = data.event.nome_evento || data.event.name;
+                    this.eventData.data = this.formatDate(new Date(data.event.data_evento || data.event.date));
+                    this.eventData.token = data.event.token || token;
+                    this.updateFormFromEventData();
                     this.renderConvite();
+                    return;
                 }
             }
         } catch (error) {
-            console.error('Erro ao buscar dados do evento:', error);
+            console.log('API não disponível, tentando localStorage');
         }
+        // Fallback: buscar evento em eternize_events pelo token (ex.: convite salvo só no dashboard)
+        const events = JSON.parse(localStorage.getItem('eternize_events')) || [];
+        const local = events.find(e => e.token === token);
+        if (local) {
+            this.eventData.nome = local.nome_evento || local.name;
+            this.eventData.data = this.formatDate(new Date(local.data_evento || local.date));
+            this.eventData.token = local.token || token;
+            if (local.cores) {
+                this.eventData.corPrincipal = local.cores.primaria;
+                this.eventData.corSecundaria = local.cores.secundaria;
+            }
+            this.updateFormFromEventData();
+            this.renderConvite();
+        }
+    }
+
+    updateFormFromEventData() {
+        document.getElementById('eventoNome').value = this.eventData.nome;
+        document.getElementById('eventoData').value = this.getDateInputValue(this.eventData.data);
+        const msgEl = document.getElementById('eventoMensagem');
+        if (msgEl) msgEl.value = this.eventData.mensagem;
+        this.updateColors();
     }
 
     selectPreset(presetNum) {
@@ -295,6 +382,7 @@ class ConviteGenerator {
         const canDownload = await this.ensurePaidBeforeDownload();
         if (!canDownload) return;
 
+        this.saveEventToDashboard();
         this.showLoading('Gerando PNG...');
 
         try {
@@ -337,6 +425,7 @@ class ConviteGenerator {
         const canDownload = await this.ensurePaidBeforeDownload();
         if (!canDownload) return;
 
+        this.saveEventToDashboard();
         this.showLoading('Gerando PDF...');
 
         try {

@@ -223,6 +223,77 @@ app.get('/api/events/:token', async (req, res) => {
     }
 });
 
+// Criar/garantir evento a partir do convite (mesmo token do QR) para página /memoria/:token
+app.post('/api/events/from-convite', async (req, res) => {
+    try {
+        const { token, nome_evento, data_evento, tema = 'neutro', cores } = req.body;
+
+        if (!token || !nome_evento || !data_evento) {
+            return res.status(400).json({
+                success: false,
+                error: 'token, nome_evento e data_evento são obrigatórios'
+            });
+        }
+
+        if (!isValidToken(token)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Token inválido'
+            });
+        }
+
+        const eventos = await readDB('eventos');
+        let event = eventos.find(e => e.token === token && e.ativo);
+
+        if (event) {
+            return res.json({ success: true, event });
+        }
+
+        const themeColors = {
+            'toy-story': { primaria: '#FFD700', secundaria: '#FF0000' },
+            'princesas': { primaria: '#FFB6C1', secundaria: '#DDA0DD' },
+            'neutro': { primaria: '#E4D9B6', secundaria: '#FFD1DC' }
+        };
+
+        const eventId = `event_${Date.now()}`;
+        const eventData = {
+            id: eventId,
+            nome_evento: sanitizeInput(String(nome_evento), 100),
+            data_evento: String(data_evento),
+            descricao: '',
+            anfitrioes: '',
+            token,
+            tema: ['toy-story', 'princesas', 'neutro'].includes(tema) ? tema : 'neutro',
+            cores: cores && cores.primaria && cores.secundaria
+                ? { primaria: String(cores.primaria).substring(0, 20), secundaria: String(cores.secundaria).substring(0, 20) }
+                : themeColors['neutro'],
+            criado_em: new Date().toISOString(),
+            ativo: true
+        };
+
+        eventos.push(eventData);
+        await writeDB('eventos', eventos);
+
+        const eventDir = path.join(__dirname, 'uploads/eventos', token);
+        await fs.mkdir(eventDir, { recursive: true });
+
+        res.status(201).json({
+            success: true,
+            event: {
+                ...eventData,
+                url_memoria: `${req.protocol}://${req.get('host')}/evento/${token}`,
+                url_convite: `${req.protocol}://${req.get('host')}/convite.html?token=${token}`
+            }
+        });
+    } catch (error) {
+        console.error('Erro ao criar evento from-convite:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Erro interno do servidor'
+        });
+    }
+});
+
 // Status do plano por token (para página de convite: bloquear download até pagamento)
 app.get('/api/events/by-token/:token/plan-status', async (req, res) => {
     try {

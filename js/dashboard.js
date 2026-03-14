@@ -429,6 +429,14 @@ function generateQRCode(url) {
     qrContainer.appendChild(infoDiv);
 }
 
+// Abre a página de convite para o evento atual (editar ou baixar novamente)
+function openConvite() {
+    if (!currentEventId) return;
+    const event = events.find(e => e.id === currentEventId);
+    if (!event || !event.token) return;
+    window.location.href = `convite.html?token=${event.token}`;
+}
+
 // Download QR Code
 function downloadQR() {
     const qrCanvas = document.querySelector('#qrCodeDisplay canvas');
