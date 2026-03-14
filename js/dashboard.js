@@ -306,6 +306,8 @@ async function loadEventPhotos(eventId) {
                 photos = data.photos.map(p => ({
                     id: p.id,
                     url: p.url || p.thumbnail,
+                    thumbnail: p.thumbnail,
+                    mediaType: p.mediaType || 'image',
                     status: p.aprovado ? 'approved' : 'pending'
                 }));
             }
@@ -351,16 +353,21 @@ function renderPhotos(photos, filter = 'all') {
     photosGrid.style.display = 'grid';
     emptyPhotos.classList.remove('show');
     
+    const isVideo = (p) => p.mediaType === 'video' || /\.(mp4|webm|mov|ogg)(\?|$)/i.test(p.url || '');
     photosGrid.innerHTML = filteredPhotos.map(photo => {
         const safeId = (photo.id || '').replace(/'/g, "\\'");
+        const video = isVideo(photo);
+        const thumb = video ? '' : `<img src="${photo.url || photo.thumbnail || 'https://via.placeholder.com/300'}" alt="Mídia do evento">`;
+        const videoPlaceholder = video ? '<div class="photo-item-video-placeholder"><span class="photo-item-video-icon">🎬</span><span>Vídeo</span></div>' : '';
         return `
         <div class="photo-item">
-            <img src="${photo.url || 'https://via.placeholder.com/300'}" alt="Foto do evento">
+            ${thumb}
+            ${videoPlaceholder}
             <span class="photo-status ${photo.status}">${photo.status === 'pending' ? 'Pendente' : 'Aprovada'}</span>
             <div class="photo-actions">
                 ${photo.status !== 'approved' ? `<button type="button" class="btn-photo-action btn-approve" onclick="approvePhoto('${safeId}')" title="Aprovar">✓ Aprovar</button>` : ''}
                 ${photo.status !== 'pending' ? `<button type="button" class="btn-photo-action btn-reject" onclick="rejectPhoto('${safeId}')" title="Desaprovar">↩ Desaprovar</button>` : ''}
-                <button type="button" class="btn-photo-action btn-delete" onclick="deletePhoto('${safeId}')" title="Excluir foto">🗑 Excluir</button>
+                <button type="button" class="btn-photo-action btn-delete" onclick="deletePhoto('${safeId}')" title="Excluir">🗑 Excluir</button>
             </div>
         </div>
     `;

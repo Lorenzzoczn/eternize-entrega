@@ -384,9 +384,15 @@ class AdminPanel {
         photosGrid.style.display = 'grid';
         emptyPhotos.style.display = 'none';
         
-        photosGrid.innerHTML = filteredPhotos.map(photo => `
+        const isVideo = (p) => p.mediaType === 'video' || /\.(mp4|webm|mov|ogg)(\?|$)/i.test(p.url || '');
+        photosGrid.innerHTML = filteredPhotos.map(photo => {
+            const video = isVideo(photo);
+            const thumb = video ? '' : `<img src="${photo.url || photo.thumbnail || 'https://via.placeholder.com/200'}" alt="Mídia">`;
+            const videoPlaceholder = video ? '<div class="photo-item-video-placeholder"><span class="photo-item-video-icon">🎬</span><span>Vídeo</span></div>' : '';
+            return `
             <div class="photo-item">
-                <img src="${photo.url || 'https://via.placeholder.com/200'}" alt="Foto do evento">
+                ${thumb}
+                ${videoPlaceholder}
                 <span class="photo-status ${photo.aprovado ? 'approved' : 'pending'}">
                     ${photo.aprovado ? 'Aprovada' : 'Pendente'}
                 </span>
@@ -397,7 +403,8 @@ class AdminPanel {
                     </div>
                 ` : ''}
             </div>
-        `).join('');
+        `;
+        }).join('');
     }
 
     async approvePhoto(photoId) {

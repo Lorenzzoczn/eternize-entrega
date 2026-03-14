@@ -351,45 +351,92 @@ class ConviteGenerator {
     }
 
     /**
-     * Garante que o QR code seja capturado pelo html2canvas: converte canvas do QR em <img>.
-     * Aguarda o canvas estar desenhado e a imagem carregar para o download incluir o QR.
+     * Garante que o QR code apareça no PNG/PDF: gera o QR em um container temporário,
+     * obtém a imagem e coloca como <img> dentro do card. Assim o html2canvas sempre captura o QR.
      * Retorna Promise<restoreFn> para chamar após a captura.
      */
     async ensureQRCodeAsImageForCapture() {
-        const qrContainer = document.getElementById('qrcode');
-        if (!qrContainer) return () => {};
-        let canvas = qrContainer.querySelector('canvas');
-        // QRCode.js pode desenhar de forma assíncrona: esperar o canvas ter conteúdo
-        if (!canvas || canvas.width === 0) {
-            await new Promise(r => setTimeout(r, 250));
-            canvas = qrContainer.querySelector('canvas');
-        }
-        if (!canvas || canvas.width === 0) return () => {};
-        try {
-            const dataUrl = canvas.toDataURL('image/png');
-            const img = document.createElement('img');
-            img.alt = 'QR Code';
-            img.style.width = canvas.width + 'px';
-            img.style.height = canvas.height + 'px';
-            img.style.display = 'block';
-            qrContainer.innerHTML = '';
-            qrContainer.appendChild(img);
-            await new Promise((resolve, reject) => {
-                img.onload = () => resolve();
-                img.onerror = () => resolve();
-                img.src = dataUrl;
-                if (img.complete) resolve();
-            });
-            const restore = () => {
-                if (qrContainer.contains(img)) {
-                    qrContainer.removeChild(img);
-                    this.generateQRCode();
+        const card = document.getElementById('conviteCard');
+        const qrContainer = card ? card.querySelector('#qrcode') : null;
+        if (!card || !qrContainer) return () => {};
+
+        const eventUrl = `${window.location.origin}/memoria/${this.eventData.token}`;
+        const size = 150;
+
+        return new Promise((resolveRestore) => {
+            const tempDiv = document.createElement('div');
+            tempDiv.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + size + 'px;height:' + size + 'px;';
+            document.body.appendChild(tempDiv);
+
+            try {
+                new QRCode(tempDiv, {
+                    text: eventUrl,
+                    width: size,
+                    height: size,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (e) {
+                document.body.removeChild(tempDiv);
+                resolveRestore(() => {});
+                return;
+            }
+
+            const tryGetDataUrl = () => {
+                const canvas = tempDiv.querySelector('canvas');
+                if (canvas && canvas.width > 0) {
+                    try {
+                        return canvas.toDataURL('image/png');
+                    } catch (err) {
+                        return null;
+                    }
                 }
+                const img = tempDiv.querySelector('img[src^="data:"]');
+                if (img && img.src) return img.src;
+                return null;
             };
-            return restore;
-        } catch (e) {
-            return () => {};
-        }
+
+            let resolved = false;
+            const applyAndResolve = () => {
+                if (resolved) return;
+                const dataUrl = tryGetDataUrl();
+                if (tempDiv.parentNode) document.body.removeChild(tempDiv);
+
+                if (!dataUrl) {
+                    resolved = true;
+                    resolveRestore(() => this.generateQRCode());
+                    return;
+                }
+
+                resolved = true;
+                const img = document.createElement('img');
+                img.alt = 'QR Code';
+                img.style.width = size + 'px';
+                img.style.height = size + 'px';
+                img.style.display = 'block';
+                qrContainer.innerHTML = '';
+                qrContainer.appendChild(img);
+                img.src = dataUrl;
+
+                const restore = () => {
+                    if (qrContainer.contains(img)) {
+                        qrContainer.removeChild(img);
+                        this.generateQRCode();
+                    }
+                };
+                resolveRestore(restore);
+            };
+
+            // QRCode.js desenha no canvas (e em alguns browsers troca por <img> de forma assíncrona)
+            setTimeout(() => {
+                if (tryGetDataUrl()) {
+                    applyAndResolve();
+                } else {
+                    setTimeout(applyAndResolve, 400);
+                }
+            }, 200);
+        });
     }
 
     async downloadPNG() {

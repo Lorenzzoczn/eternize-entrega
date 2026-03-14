@@ -95,12 +95,20 @@ class EventoPage {
             document.getElementById('photoInput').click();
         });
 
+        document.getElementById('videoBtn')?.addEventListener('click', () => {
+            document.getElementById('videoInput').click();
+        });
+
         // Inputs de arquivo
         document.getElementById('photoInput')?.addEventListener('change', (e) => {
             this.handleFileSelect(e.target.files);
         });
 
         document.getElementById('cameraInput')?.addEventListener('change', (e) => {
+            this.handleFileSelect(e.target.files);
+        });
+
+        document.getElementById('videoInput')?.addEventListener('change', (e) => {
             this.handleFileSelect(e.target.files);
         });
 
@@ -151,21 +159,32 @@ class EventoPage {
     async handleFileSelect(files) {
         if (!files || files.length === 0) return;
 
-        // Validar e adicionar arquivos
+        const maxImageSize = 10 * 1024 * 1024;   // 10MB fotos
+        const maxVideoSize = 100 * 1024 * 1024; // 100MB vídeos
+
         for (let file of files) {
-            if (!file.type.startsWith('image/')) {
-                alert('Apenas imagens são permitidas');
+            const isImage = file.type.startsWith('image/');
+            const isVideo = file.type.startsWith('video/');
+
+            if (!isImage && !isVideo) {
+                alert('Apenas fotos e vídeos são permitidos.');
                 continue;
             }
 
-            if (file.size > 10 * 1024 * 1024) {
-                alert(`${file.name} é muito grande. Máximo 10MB por foto.`);
-                continue;
+            if (isImage) {
+                if (file.size > maxImageSize) {
+                    alert(`${file.name} é muito grande. Máximo 10MB por foto.`);
+                    continue;
+                }
+                const compressedFile = await this.compressImage(file);
+                this.selectedFiles.push(compressedFile);
+            } else {
+                if (file.size > maxVideoSize) {
+                    alert(`${file.name} é muito grande. Máximo 100MB por vídeo.`);
+                    continue;
+                }
+                this.selectedFiles.push(file);
             }
-
-            // Comprimir imagem
-            const compressedFile = await this.compressImage(file);
-            this.selectedFiles.push(compressedFile);
         }
 
         if (this.selectedFiles.length > 0) {
@@ -226,22 +245,36 @@ class EventoPage {
         previewImages.innerHTML = '';
 
         this.selectedFiles.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const div = document.createElement('div');
-                div.className = 'preview-item';
+            const isVideo = file.type.startsWith('video/');
+            const div = document.createElement('div');
+            div.className = 'preview-item';
+
+            const bindRemove = () => {
+                div.querySelector('.preview-remove')?.addEventListener('click', () => this.removeFile(index));
+            };
+
+            if (isVideo) {
+                const url = URL.createObjectURL(file);
                 div.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview">
+                    <video src="${url}" muted playsinline preload="metadata"></video>
+                    <span class="preview-badge preview-badge-video">Vídeo</span>
                     <button class="preview-remove" data-index="${index}">×</button>
                 `;
-
-                div.querySelector('.preview-remove').addEventListener('click', () => {
-                    this.removeFile(index);
-                });
-
+                bindRemove();
                 previewImages.appendChild(div);
-            };
-            reader.readAsDataURL(file);
+            } else {
+                div.innerHTML = '<div class="preview-loading">Carregando...</div>';
+                previewImages.appendChild(div);
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    div.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview">
+                        <button class="preview-remove" data-index="${index}">×</button>
+                    `;
+                    bindRemove();
+                };
+                reader.readAsDataURL(file);
+            }
         });
     }
 
@@ -261,11 +294,12 @@ class EventoPage {
         document.getElementById('formFields').style.display = 'none';
         document.getElementById('photoInput').value = '';
         document.getElementById('cameraInput').value = '';
+        document.getElementById('videoInput').value = '';
     }
 
     async uploadPhotos() {
         if (this.selectedFiles.length === 0) {
-            alert('Selecione pelo menos uma foto');
+            alert('Selecione pelo menos uma foto ou vídeo');
             return;
         }
 
@@ -366,16 +400,30 @@ class EventoPage {
 
         grid.innerHTML = '';
 
+        const isVideo = (item) => item.mediaType === 'video' || /\.(mp4|webm|mov|ogg)(\?|$)/i.test(item.url || '');
+
         photosToShow.forEach((photo, index) => {
             const div = document.createElement('div');
             div.className = 'gallery-item';
-            div.innerHTML = `
-                <img src="${photo.url}" alt="Foto do evento" loading="lazy">
-                <div class="gallery-item-overlay">
-                    ${photo.message ? `<p class="gallery-item-message">${photo.message}</p>` : ''}
-                    ${photo.uploaded_by !== 'anonymous' ? `<p class="gallery-item-author">Por: ${photo.uploaded_by}</p>` : ''}
-                </div>
-            `;
+            const video = isVideo(photo);
+            if (video) {
+                div.innerHTML = `
+                    <video src="${photo.url}" muted playsinline preload="metadata" poster="${photo.thumbnail || ''}"></video>
+                    <span class="gallery-item-play">▶</span>
+                    <div class="gallery-item-overlay">
+                        ${photo.message ? `<p class="gallery-item-message">${photo.message}</p>` : ''}
+                        ${photo.uploaded_by !== 'anonymous' ? `<p class="gallery-item-author">Por: ${photo.uploaded_by}</p>` : ''}
+                    </div>
+                `;
+            } else {
+                div.innerHTML = `
+                    <img src="${photo.url}" alt="Foto do evento" loading="lazy">
+                    <div class="gallery-item-overlay">
+                        ${photo.message ? `<p class="gallery-item-message">${photo.message}</p>` : ''}
+                        ${photo.uploaded_by !== 'anonymous' ? `<p class="gallery-item-author">Por: ${photo.uploaded_by}</p>` : ''}
+                    </div>
+                `;
+            }
 
             div.addEventListener('click', () => {
                 this.openLightbox(index);
@@ -413,12 +461,27 @@ class EventoPage {
         this.currentPhotoIndex = index;
         const lightbox = document.getElementById('lightbox');
         const image = document.getElementById('lightboxImage');
+        const videoEl = document.getElementById('lightboxVideo');
         const info = document.getElementById('lightboxInfo');
 
-        if (!lightbox || !image) return;
+        if (!lightbox) return;
 
         const photo = this.photos[index];
-        image.src = photo.url;
+        const isVideo = photo.mediaType === 'video' || /\.(mp4|webm|mov|ogg)(\?|$)/i.test(photo.url || '');
+
+        if (isVideo && videoEl) {
+            image.style.display = 'none';
+            videoEl.style.display = 'block';
+            videoEl.src = photo.url;
+            videoEl.load();
+            videoEl.play().catch(() => {});
+        } else if (image) {
+            videoEl.style.display = 'none';
+            videoEl.pause();
+            videoEl.removeAttribute('src');
+            image.style.display = 'block';
+            image.src = photo.url;
+        }
 
         if (info) {
             info.innerHTML = `
@@ -433,6 +496,11 @@ class EventoPage {
 
     closeLightbox() {
         const lightbox = document.getElementById('lightbox');
+        const videoEl = document.getElementById('lightboxVideo');
+        if (videoEl) {
+            videoEl.pause();
+            videoEl.removeAttribute('src');
+        }
         if (lightbox) {
             lightbox.style.display = 'none';
             document.body.style.overflow = '';

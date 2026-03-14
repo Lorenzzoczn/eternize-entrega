@@ -28,8 +28,8 @@
             <div class="upload-card">
                 <div class="upload-header">
                     <span class="section-label">Envie suas memórias</span>
-                    <h2><span class="upload-title-icon">📸</span> Compartilhe Suas Fotos</h2>
-                    <p>Toque em um dos botões abaixo para tirar uma nova foto ou escolher da galeria do seu celular.</p>
+                    <h2><span class="upload-title-icon">📸</span> Compartilhe Fotos e Vídeos</h2>
+                    <p>Toque em um dos botões para tirar foto, gravar vídeo ou escolher da galeria do celular.</p>
                 </div>
 
                 <form id="uploadForm" class="upload-form">
@@ -42,13 +42,19 @@
                         </button>
                         <button type="button" class="upload-option-btn upload-option-gallery" id="galleryBtn">
                             <span class="option-icon">🖼️</span>
-                            <span>Escolher da Galeria</span>
-                            <span class="option-hint">Fotos do celular</span>
+                            <span>Galeria</span>
+                            <span class="option-hint">Fotos e vídeos</span>
+                        </button>
+                        <button type="button" class="upload-option-btn upload-option-video" id="videoBtn">
+                            <span class="option-icon">🎬</span>
+                            <span>Gravar Vídeo</span>
+                            <span class="option-hint">Câmera de vídeo</span>
                         </button>
                     </div>
 
-                    <input type="file" id="photoInput" accept="image/*" multiple hidden>
+                    <input type="file" id="photoInput" accept="image/*,video/*" multiple hidden>
                     <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
+                    <input type="file" id="videoInput" accept="video/*" capture="environment" hidden>
 
                     <!-- Preview Area -->
                     <div class="upload-preview-area" id="uploadPreviewArea" style="display: none;">
@@ -80,15 +86,15 @@
 
                         <button type="submit" class="btn btn-primary btn-large btn-block btn-upload-submit" id="submitBtn">
                             <span class="btn-icon">📤</span>
-                            <span>Enviar Fotos</span>
+                            <span>Enviar Fotos e Vídeos</span>
                         </button>
                     </div>
                 </form>
 
                 <div class="upload-success" id="uploadSuccess" style="display: none;">
                     <div class="success-icon">✨</div>
-                    <h3>Fotos enviadas!</h3>
-                    <p>Obrigado por participar. Suas fotos serão exibidas na galeria em instantes.</p>
+                    <h3>Enviado com sucesso!</h3>
+                    <p>Obrigado por participar. Suas fotos e vídeos serão exibidos na galeria em instantes.</p>
                     <button class="btn btn-secondary" id="uploadMoreBtn">
                         Enviar mais fotos
                     </button>
@@ -108,7 +114,7 @@
                 <div class="gallery-stats" id="galleryStats">
                     <span class="stat-item stat-photos">
                         <span class="stat-icon">📸</span>
-                        <span id="photoCount">0</span> fotos
+                        <span id="photoCount">0</span> itens
                     </span>
                     <span class="stat-item stat-people">
                         <span class="stat-icon">👥</span>
@@ -128,8 +134,8 @@
             <!-- Empty State -->
             <div class="gallery-empty" id="galleryEmpty" style="display: none;">
                 <div class="empty-icon">✨</div>
-                <h3>Nenhuma foto ainda</h3>
-                <p>Seja o primeiro a enviar uma foto usando os botões acima.</p>
+                <h3>Nenhum conteúdo ainda</h3>
+                <p>Seja o primeiro a enviar uma foto ou vídeo usando os botões acima.</p>
             </div>
 
             <!-- Load More -->
@@ -141,13 +147,14 @@
         </div>
     </section>
 
-    <!-- Lightbox -->
+    <!-- Lightbox (foto ou vídeo) -->
     <div class="lightbox" id="lightbox" style="display: none;">
         <button class="lightbox-close" id="lightboxClose">×</button>
         <button class="lightbox-prev" id="lightboxPrev">‹</button>
         <button class="lightbox-next" id="lightboxNext">›</button>
         <div class="lightbox-content">
-            <img id="lightboxImage" src="" alt="Foto">
+            <img id="lightboxImage" src="" alt="Mídia" style="display: none;">
+            <video id="lightboxVideo" controls playsinline style="display: none;"></video>
             <div class="lightbox-info" id="lightboxInfo"></div>
         </div>
     </div>

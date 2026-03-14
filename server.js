@@ -65,19 +65,19 @@ const ensureDirectories = async () => {
 
 ensureDirectories();
 
-// Configuração do Multer
+// Configuração do Multer (fotos e vídeos)
 const storage = multer.memoryStorage();
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: 10 * 1024 * 1024, // 10MB
+        fileSize: 100 * 1024 * 1024, // 100MB (vídeos); fotos continuam sendo otimizadas
         files: 1
     },
     fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith('image/')) {
+        if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
             cb(null, true);
         } else {
-            cb(new Error('Apenas imagens são permitidas'), false);
+            cb(new Error('Apenas imagens e vídeos são permitidos'), false);
         }
     }
 });
@@ -318,10 +318,10 @@ app.delete('/api/events/:token', async (req, res) => {
         const photosToDelete = fotos.filter(f => f.token === token);
         for (const photo of photosToDelete) {
             try {
-                const filePath = path.join(__dirname, photo.url);
-                const thumbPath = path.join(__dirname, photo.thumbnail);
-                await fs.unlink(filePath).catch(() => {});
-                await fs.unlink(thumbPath).catch(() => {});
+                await fs.unlink(path.join(__dirname, photo.url)).catch(() => {});
+                if (photo.thumbnail) {
+                    await fs.unlink(path.join(__dirname, photo.thumbnail)).catch(() => {});
+                }
             } catch (err) {
                 console.error('Erro ao deletar arquivo da foto:', err);
             }
@@ -446,7 +446,7 @@ app.post('/api/payments/create', async (req, res) => {
     }
 });
 
-// Upload de foto
+// Upload de foto ou vídeo
 app.post('/api/upload', uploadLimiter, upload.single('photo'), async (req, res) => {
     try {
         const { token, message = '', uploaded_by = 'anonymous' } = req.body;
@@ -466,7 +466,6 @@ app.post('/api/upload', uploadLimiter, upload.single('photo'), async (req, res) 
             });
         }
 
-        // Verificar se evento existe
         const eventos = await readDB('eventos');
         const event = eventos.find(e => e.token === token && e.ativo);
 
@@ -477,43 +476,48 @@ app.post('/api/upload', uploadLimiter, upload.single('photo'), async (req, res) 
             });
         }
 
-        // Gerar ID e nome do arquivo
+        const isVideo = file.mimetype.startsWith('video/');
         const photoId = `photo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const fileName = `${photoId}.jpg`;
         const eventDir = path.join(__dirname, 'uploads/eventos', token);
-        const filePath = path.join(eventDir, fileName);
+        await fs.mkdir(eventDir, { recursive: true });
 
-        // Processar imagem com Sharp (compressão e otimização)
-        await sharp(file.buffer)
-            .resize(1920, 1920, {
-                fit: 'inside',
-                withoutEnlargement: true
-            })
-            .jpeg({ quality: 85 })
-            .toFile(filePath);
+        let fileName, filePath, thumbnailPath, thumbnailUrl;
 
-        // Criar thumbnail
-        const thumbnailPath = path.join(eventDir, `thumb_${fileName}`);
-        await sharp(file.buffer)
-            .resize(400, 400, {
-                fit: 'cover'
-            })
-            .jpeg({ quality: 80 })
-            .toFile(thumbnailPath);
+        if (isVideo) {
+            const ext = path.extname(file.originalname) || (file.mimetype === 'video/quicktime' ? '.mov' : '.mp4');
+            fileName = `${photoId}${ext}`;
+            filePath = path.join(eventDir, fileName);
+            await fs.writeFile(filePath, file.buffer);
+            thumbnailPath = null;
+            thumbnailUrl = null;
+        } else {
+            fileName = `${photoId}.jpg`;
+            filePath = path.join(eventDir, fileName);
+            await sharp(file.buffer)
+                .resize(1920, 1920, { fit: 'inside', withoutEnlargement: true })
+                .jpeg({ quality: 85 })
+                .toFile(filePath);
+            thumbnailPath = path.join(eventDir, `thumb_${fileName}`);
+            await sharp(file.buffer)
+                .resize(400, 400, { fit: 'cover' })
+                .jpeg({ quality: 80 })
+                .toFile(thumbnailPath);
+            thumbnailUrl = `/uploads/eventos/${token}/thumb_${fileName}`;
+        }
 
-        // Salvar metadados
         const photoData = {
             id: photoId,
             evento_id: event.id,
             token: token,
+            mediaType: isVideo ? 'video' : 'image',
             url: `/uploads/eventos/${token}/${fileName}`,
-            thumbnail: `/uploads/eventos/${token}/thumb_${fileName}`,
+            thumbnail: thumbnailUrl,
             original_name: file.originalname,
             size: file.size,
             uploaded_by: sanitizeInput(uploaded_by, 50),
             message: sanitizeInput(message, 200),
             criado_em: new Date().toISOString(),
-            aprovado: true // Visível para todos assim que enviada; criador pode excluir se não gostar
+            aprovado: true
         };
 
         const fotos = await readDB('fotos');
@@ -529,7 +533,7 @@ app.post('/api/upload', uploadLimiter, upload.single('photo'), async (req, res) 
         console.error('Erro ao fazer upload:', error);
         res.status(500).json({
             success: false,
-            error: 'Erro ao fazer upload da foto'
+            error: 'Erro ao fazer upload'
         });
     }
 });
@@ -633,12 +637,12 @@ app.delete('/api/photos/:photoId', async (req, res) => {
             });
         }
 
-        // Deletar arquivos
+        // Deletar arquivos (vídeos não têm thumbnail)
         try {
-            const filePath = path.join(__dirname, photo.url);
-            const thumbnailPath = path.join(__dirname, photo.thumbnail);
-            await fs.unlink(filePath);
-            await fs.unlink(thumbnailPath);
+            await fs.unlink(path.join(__dirname, photo.url));
+            if (photo.thumbnail) {
+                await fs.unlink(path.join(__dirname, photo.thumbnail));
+            }
         } catch (error) {
             console.error('Erro ao deletar arquivos:', error);
         }
