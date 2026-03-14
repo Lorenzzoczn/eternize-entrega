@@ -260,12 +260,40 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
     padding: 30px;
     border-bottom: 1px solid #E0E0E0;
 }
 
 .modal-header h2 {
     font-size: 1.8rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.modal-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-danger-outline {
+    padding: 8px 16px;
+    border: 1px solid #c62828;
+    color: #c62828;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-danger-outline:hover {
+    background: #ffebee;
+    border-color: #b71c1c;
+    color: #b71c1c;
 }
 
 .modal-close {
@@ -460,44 +488,66 @@
     left: 0;
     right: 0;
     display: flex;
-    gap: 5px;
-    padding: 8px;
-    background: rgba(0, 0, 0, 0.8);
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.85);
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.25s;
 }
 
-.photo-item:hover .photo-actions {
+.photo-item:hover .photo-actions,
+.photo-item:focus-within .photo-actions {
     opacity: 1;
 }
 
-.btn-approve,
-.btn-reject {
+@media (max-width: 768px) {
+    .photo-actions {
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.75);
+    }
+}
+
+.btn-photo-action {
     flex: 1;
-    padding: 8px;
+    min-width: 70px;
+    padding: 8px 10px;
     border: none;
-    border-radius: 5px;
-    color: var(--white);
+    border-radius: 8px;
+    color: #fff;
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
+}
+
+.btn-photo-action:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
 }
 
 .btn-approve {
-    background: #4CAF50;
+    background: #2e7d32;
 }
 
 .btn-approve:hover {
-    background: #45a049;
+    background: #1b5e20;
 }
 
 .btn-reject {
-    background: #f44336;
+    background: #ed6c02;
 }
 
 .btn-reject:hover {
-    background: #da190b;
+    background: #e65100;
+}
+
+.btn-delete {
+    background: #c62828;
+}
+
+.btn-delete:hover {
+    background: #b71c1c;
 }
 
 .empty-photos {

@@ -156,7 +156,12 @@
         <div class="modal-content modal-large">
             <div class="modal-header">
                 <h2 id="modalEventName">Evento</h2>
-                <button class="modal-close" onclick="closeEventModal()">&times;</button>
+                <div class="modal-header-actions">
+                    <button type="button" class="btn btn-danger-outline" onclick="deleteEvent()" title="Excluir este evento">
+                        🗑 Excluir evento
+                    </button>
+                    <button class="modal-close" onclick="closeEventModal()">&times;</button>
+                </div>
             </div>
             <div class="modal-body">
                 <div class="event-details-grid">

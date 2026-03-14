@@ -294,6 +294,60 @@ app.post('/api/events/from-convite', async (req, res) => {
     }
 });
 
+// Excluir evento (e todas as fotos associadas)
+app.delete('/api/events/:token', async (req, res) => {
+    try {
+        const { token } = req.params;
+        if (!isValidToken(token)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Token inválido'
+            });
+        }
+
+        const eventos = await readDB('eventos');
+        const eventIndex = eventos.findIndex(e => e.token === token);
+        if (eventIndex === -1) {
+            return res.status(404).json({
+                success: false,
+                error: 'Evento não encontrado'
+            });
+        }
+
+        const fotos = await readDB('fotos');
+        const photosToDelete = fotos.filter(f => f.token === token);
+        for (const photo of photosToDelete) {
+            try {
+                const filePath = path.join(__dirname, photo.url);
+                const thumbPath = path.join(__dirname, photo.thumbnail);
+                await fs.unlink(filePath).catch(() => {});
+                await fs.unlink(thumbPath).catch(() => {});
+            } catch (err) {
+                console.error('Erro ao deletar arquivo da foto:', err);
+            }
+        }
+        const fotosRestantes = fotos.filter(f => f.token !== token);
+        await writeDB('fotos', fotosRestantes);
+
+        eventos.splice(eventIndex, 1);
+        await writeDB('eventos', eventos);
+
+        const eventDir = path.join(__dirname, 'uploads/eventos', token);
+        await fs.rm(eventDir, { recursive: true }).catch(() => {});
+
+        res.json({
+            success: true,
+            message: 'Evento excluído com sucesso'
+        });
+    } catch (error) {
+        console.error('Erro ao excluir evento:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Erro ao excluir evento'
+        });
+    }
+});
+
 // Status do plano por token (para página de convite: bloquear download até pagamento)
 app.get('/api/events/by-token/:token/plan-status', async (req, res) => {
     try {

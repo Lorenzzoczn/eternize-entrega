@@ -341,18 +341,20 @@ function renderPhotos(photos, filter = 'all') {
     photosGrid.style.display = 'grid';
     emptyPhotos.classList.remove('show');
     
-    photosGrid.innerHTML = filteredPhotos.map(photo => `
+    photosGrid.innerHTML = filteredPhotos.map(photo => {
+        const safeId = (photo.id || '').replace(/'/g, "\\'");
+        return `
         <div class="photo-item">
             <img src="${photo.url || 'https://via.placeholder.com/300'}" alt="Foto do evento">
             <span class="photo-status ${photo.status}">${photo.status === 'pending' ? 'Pendente' : 'Aprovada'}</span>
-            ${photo.status === 'pending' ? `
-                <div class="photo-actions">
-                    <button class="btn-approve" onclick="approvePhoto('${photo.id}')">✓</button>
-                    <button class="btn-reject" onclick="rejectPhoto('${photo.id}')">✕</button>
-                </div>
-            ` : ''}
+            <div class="photo-actions">
+                ${photo.status !== 'approved' ? `<button type="button" class="btn-photo-action btn-approve" onclick="approvePhoto('${safeId}')" title="Aprovar">✓ Aprovar</button>` : ''}
+                ${photo.status !== 'pending' ? `<button type="button" class="btn-photo-action btn-reject" onclick="rejectPhoto('${safeId}')" title="Desaprovar">↩ Desaprovar</button>` : ''}
+                <button type="button" class="btn-photo-action btn-delete" onclick="deletePhoto('${safeId}')" title="Excluir foto">🗑 Excluir</button>
+            </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 // Filter photos
@@ -389,9 +391,8 @@ async function approvePhoto(photoId) {
     }
 }
 
-// Reject photo (remove aprovação; foto volta para Pendentes)
+// Desaprovar foto (volta para Pendentes)
 async function rejectPhoto(photoId) {
-    if (!confirm('Tem certeza que deseja rejeitar esta foto?')) return;
     const event = events.find(e => e.id === currentEventId);
     if (event && event.token) {
         try {
@@ -407,9 +408,58 @@ async function rejectPhoto(photoId) {
         return;
     }
     const photos = JSON.parse(localStorage.getItem(`event_${currentEventId}_photos`)) || [];
-    const filteredPhotos = photos.filter(p => p.id !== photoId);
-    localStorage.setItem(`event_${currentEventId}_photos`, JSON.stringify(filteredPhotos));
+    const p = photos.find(x => x.id === photoId);
+    if (p) p.status = 'pending';
+    localStorage.setItem(`event_${currentEventId}_photos`, JSON.stringify(photos));
     loadEventPhotos(currentEventId);
+}
+
+// Excluir foto (remove da galeria)
+async function deletePhoto(photoId) {
+    if (!confirm('Excluir esta foto? Ela será removida permanentemente.')) return;
+    const event = events.find(e => e.id === currentEventId);
+    if (event && event.token) {
+        try {
+            const res = await fetch(`/api/photos/${photoId}`, { method: 'DELETE' });
+            if (res.ok) await loadEventPhotos(currentEventId);
+        } catch (err) {
+            console.error(err);
+        }
+        return;
+    }
+    const photos = JSON.parse(localStorage.getItem(`event_${currentEventId}_photos`)) || [];
+    const filtered = photos.filter(p => p.id !== photoId);
+    localStorage.setItem(`event_${currentEventId}_photos`, JSON.stringify(filtered));
+    loadEventPhotos(currentEventId);
+}
+
+// Excluir evento (e todas as fotos)
+async function deleteEvent() {
+    if (!currentEventId) return;
+    const event = events.find(e => e.id === currentEventId);
+    if (!event) return;
+    if (!confirm('Excluir este evento? Todas as fotos serão removidas e esta ação não pode ser desfeita.')) return;
+
+    if (event.token) {
+        try {
+            const res = await fetch(`/api/events/${event.token}`, { method: 'DELETE' });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                alert(data.error || 'Erro ao excluir evento.');
+                return;
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Erro ao excluir evento. Tente novamente.');
+            return;
+        }
+    }
+
+    events = events.filter(e => e.id !== currentEventId);
+    localStorage.setItem('eternize_events', JSON.stringify(events));
+    localStorage.removeItem(`event_${currentEventId}_photos`);
+    closeEventModal();
+    initDashboard();
 }
 
 // Copy share link
