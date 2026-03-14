@@ -27,20 +27,23 @@
         <div class="container">
             <div class="upload-card">
                 <div class="upload-header">
-                    <h2>📸 Compartilhe Suas Fotos</h2>
-                    <p>Faça parte deste momento especial enviando suas fotos</p>
+                    <span class="section-label">Envie suas memórias</span>
+                    <h2><span class="upload-title-icon">📸</span> Compartilhe Suas Fotos</h2>
+                    <p>Toque em um dos botões abaixo para tirar uma nova foto ou escolher da galeria do seu celular.</p>
                 </div>
 
                 <form id="uploadForm" class="upload-form">
                     <!-- Camera/Gallery Selection -->
                     <div class="upload-options">
-                        <button type="button" class="upload-option-btn" id="cameraBtn">
+                        <button type="button" class="upload-option-btn upload-option-camera" id="cameraBtn">
                             <span class="option-icon">📷</span>
                             <span>Tirar Foto</span>
+                            <span class="option-hint">Abre a câmera</span>
                         </button>
-                        <button type="button" class="upload-option-btn" id="galleryBtn">
+                        <button type="button" class="upload-option-btn upload-option-gallery" id="galleryBtn">
                             <span class="option-icon">🖼️</span>
                             <span>Escolher da Galeria</span>
+                            <span class="option-hint">Fotos do celular</span>
                         </button>
                     </div>
 
@@ -51,20 +54,20 @@
                     <div class="upload-preview-area" id="uploadPreviewArea" style="display: none;">
                         <div class="preview-images" id="previewImages"></div>
                         <button type="button" class="btn-remove-all" id="removeAllBtn">
-                            Remover Todas
+                            Limpar seleção
                         </button>
                     </div>
 
                     <!-- Form Fields -->
                     <div class="form-fields" id="formFields" style="display: none;">
                         <div class="form-group">
-                            <label for="uploaderName">Seu Nome (opcional)</label>
-                            <input type="text" id="uploaderName" placeholder="Digite seu nome" maxlength="50">
+                            <label for="uploaderName">Seu nome (opcional)</label>
+                            <input type="text" id="uploaderName" placeholder="Ex.: Maria, João..." maxlength="50">
                         </div>
 
                         <div class="form-group">
                             <label for="photoMessage">Mensagem (opcional)</label>
-                            <textarea id="photoMessage" rows="3" placeholder="Deixe uma mensagem especial..." maxlength="200"></textarea>
+                            <textarea id="photoMessage" rows="3" placeholder="Ex.: Parabéns! Que dia lindo! 💕" maxlength="200"></textarea>
                         </div>
 
                         <!-- Upload Progress -->
@@ -75,7 +78,7 @@
                             <p class="progress-text" id="progressText">Enviando...</p>
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-large btn-block" id="submitBtn">
+                        <button type="submit" class="btn btn-primary btn-large btn-block btn-upload-submit" id="submitBtn">
                             <span class="btn-icon">📤</span>
                             <span>Enviar Fotos</span>
                         </button>
@@ -83,11 +86,11 @@
                 </form>
 
                 <div class="upload-success" id="uploadSuccess" style="display: none;">
-                    <div class="success-icon">✅</div>
-                    <h3>Fotos Enviadas com Sucesso!</h3>
-                    <p>Suas fotos foram recebidas e em breve aparecerão na galeria.</p>
+                    <div class="success-icon">✨</div>
+                    <h3>Fotos enviadas!</h3>
+                    <p>Obrigado por participar. Suas fotos serão exibidas na galeria em instantes.</p>
                     <button class="btn btn-secondary" id="uploadMoreBtn">
-                        Enviar Mais Fotos
+                        Enviar mais fotos
                     </button>
                 </div>
             </div>
@@ -98,13 +101,16 @@
     <section class="gallery-section">
         <div class="container">
             <div class="gallery-header">
-                <h2>🖼️ Galeria de Momentos</h2>
+                <div>
+                    <span class="section-label section-label-gallery">Momentos compartilhados</span>
+                    <h2><span class="gallery-title-icon">🖼️</span> Galeria de Momentos</h2>
+                </div>
                 <div class="gallery-stats" id="galleryStats">
-                    <span class="stat-item">
+                    <span class="stat-item stat-photos">
                         <span class="stat-icon">📸</span>
                         <span id="photoCount">0</span> fotos
                     </span>
-                    <span class="stat-item">
+                    <span class="stat-item stat-people">
                         <span class="stat-icon">👥</span>
                         <span id="contributorCount">0</span> pessoas
                     </span>
@@ -115,21 +121,21 @@
             <div class="gallery-grid" id="galleryGrid">
                 <div class="gallery-loading">
                     <div class="loading-spinner"></div>
-                    <p>Carregando fotos...</p>
+                    <p>Carregando galeria...</p>
                 </div>
             </div>
 
             <!-- Empty State -->
             <div class="gallery-empty" id="galleryEmpty" style="display: none;">
-                <div class="empty-icon">📸</div>
-                <h3>Nenhuma Foto Ainda</h3>
-                <p>Seja o primeiro a compartilhar um momento especial!</p>
+                <div class="empty-icon">✨</div>
+                <h3>Nenhuma foto ainda</h3>
+                <p>Seja o primeiro a enviar uma foto usando os botões acima.</p>
             </div>
 
             <!-- Load More -->
             <div class="gallery-load-more" id="loadMoreContainer" style="display: none;">
                 <button class="btn btn-secondary" id="loadMoreBtn">
-                    Carregar Mais Fotos
+                    Ver mais fotos
                 </button>
             </div>
         </div>
@@ -149,7 +155,7 @@
     <!-- Footer -->
     <footer class="evento-footer">
         <div class="container">
-            <p>Powered by <a href="index.html">✨ Eternize</a></p>
+            <p>Criado com <a href="index.html">✨ Eternize</a></p>
         </div>
     </footer>
 

@@ -87,23 +87,12 @@ class ConviteGenerator {
     }
 
     /**
-     * Verifica se o evento tem plano pago. Se não tiver, redireciona para checkout e retorna false.
-     * @returns {Promise<boolean>} true se pode baixar, false se redirecionou.
+     * Antes verificava plano pago para permitir download. Agora o checkout não é mais validação:
+     * todos podem baixar convite/QR. O checkout permanece disponível, mas não bloqueia acesso.
+     * @returns {Promise<boolean>} sempre true (acesso liberado).
      */
     async ensurePaidBeforeDownload() {
-        const token = this.eventData.token;
-        const base = this.getApiBase();
-        try {
-            const res = await fetch(`${base}/api/events/by-token/${encodeURIComponent(token)}/plan-status`);
-            const data = await res.json().catch(() => ({}));
-            if (data.hasPlan) return true;
-        } catch (e) {
-            console.warn('Erro ao verificar plano:', e);
-        }
-        const returnUrl = encodeURIComponent(window.location.href);
-        const checkoutUrl = `${base}/checkout.html?clientId=${encodeURIComponent(token)}&returnUrl=${returnUrl}`;
-        window.location.href = checkoutUrl;
-        return false;
+        return true;
     }
 
     loadEventData() {

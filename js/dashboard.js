@@ -257,12 +257,7 @@ function openEvent(eventId) {
     const event = events.find(e => e.id === eventId);
     if (!event) return;
 
-    // Verificar plano antes de permitir acesso completo
-    if (!isEventPremiumActive(event)) {
-        alert('Seu plano ainda não está ativo para este evento.\n\nConclua o pagamento ou aguarde a confirmação para liberar o QR Code e o download de fotos.');
-        return;
-    }
-    
+    // Acesso ao QR Code e download não depende mais de validação de pagamento
     document.getElementById('modalEventName').textContent = event.name || event.nome_evento;
     
     // Generate share link using token if available

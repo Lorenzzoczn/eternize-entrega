@@ -28,7 +28,8 @@ class EventoPage {
 
     getTokenFromURL() {
         const path = window.location.pathname;
-        const match = path.match(/\/evento\/([a-z0-9]{12})/);
+        // Suporta /evento/TOKEN e /memoria/TOKEN (link do QR Code)
+        const match = path.match(/\/(?:evento|memoria)\/([a-z0-9]{12})/);
         return match ? match[1] : null;
     }
 
