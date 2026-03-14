@@ -197,13 +197,13 @@
                         </div>
 
                         <div class="photos-tabs">
-                            <button class="tab-btn active" onclick="filterPhotos('all')">
+                            <button class="tab-btn active" data-filter="all" onclick="filterPhotos('all')">
                                 Todas (<span id="countAll">0</span>)
                             </button>
-                            <button class="tab-btn" onclick="filterPhotos('pending')">
+                            <button class="tab-btn" data-filter="pending" onclick="filterPhotos('pending')">
                                 Pendentes (<span id="countPending">0</span>)
                             </button>
-                            <button class="tab-btn" onclick="filterPhotos('approved')">
+                            <button class="tab-btn" data-filter="approved" onclick="filterPhotos('approved')">
                                 Aprovadas (<span id="countApproved">0</span>)
                             </button>
                         </div>

@@ -251,6 +251,8 @@ document.getElementById('createEventForm').addEventListener('submit', async func
 
 // Open event details
 let currentEventId = null;
+let currentEventPhotos = [];
+let currentPhotoFilter = 'all';
 
 function openEvent(eventId) {
     currentEventId = eventId;
@@ -270,7 +272,7 @@ function openEvent(eventId) {
     // Generate QR Code
     generateQRCode(shareUrl);
     
-    // Load photos
+    // Load photos (API quando tem token, senão localStorage)
     loadEventPhotos(eventId);
     
     document.getElementById('eventModal').classList.add('active');
@@ -281,20 +283,43 @@ function closeEventModal() {
     currentEventId = null;
 }
 
-// Load event photos
-function loadEventPhotos(eventId) {
-    const photos = JSON.parse(localStorage.getItem(`event_${eventId}_photos`)) || [];
-    
-    // Update counts
+// Load event photos (da API quando o evento tem token, para mostrar fotos enviadas via QR)
+async function loadEventPhotos(eventId) {
+    const event = events.find(e => e.id === eventId);
+    let photos = [];
+
+    if (event && event.token) {
+        try {
+            const response = await fetch(`/api/photos/${event.token}`);
+            const data = await response.json();
+            if (data.success && data.photos) {
+                photos = data.photos.map(p => ({
+                    id: p.id,
+                    url: p.url || p.thumbnail,
+                    status: p.aprovado ? 'approved' : 'pending'
+                }));
+            }
+        } catch (err) {
+            console.warn('API de fotos indisponível, usando localStorage', err);
+        }
+    }
+
+    if (photos.length === 0) {
+        photos = JSON.parse(localStorage.getItem(`event_${eventId}_photos`)) || [];
+    }
+
+    currentEventPhotos = photos;
+    currentPhotoFilter = 'all';
+
     const allCount = photos.length;
     const pendingCount = photos.filter(p => p.status === 'pending').length;
     const approvedCount = photos.filter(p => p.status === 'approved').length;
-    
+
     document.getElementById('countAll').textContent = allCount;
     document.getElementById('countPending').textContent = pendingCount;
     document.getElementById('countApproved').textContent = approvedCount;
-    
-    renderPhotos(photos);
+
+    renderPhotos(photos, 'all');
 }
 
 // Render photos
@@ -332,19 +357,29 @@ function renderPhotos(photos, filter = 'all') {
 
 // Filter photos
 function filterPhotos(filter) {
-    // Update active tab
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    event.target.classList.add('active');
-    
-    // Load and filter photos
-    const photos = JSON.parse(localStorage.getItem(`event_${currentEventId}_photos`)) || [];
-    renderPhotos(photos, filter);
+    currentPhotoFilter = filter;
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.querySelector(`.tab-btn[data-filter="${filter}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+    renderPhotos(currentEventPhotos, filter);
 }
 
 // Approve photo
-function approvePhoto(photoId) {
+async function approvePhoto(photoId) {
+    const event = events.find(e => e.id === currentEventId);
+    if (event && event.token) {
+        try {
+            const res = await fetch(`/api/photos/${photoId}/approve`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ approved: true })
+            });
+            if (res.ok) await loadEventPhotos(currentEventId);
+        } catch (err) {
+            console.error(err);
+        }
+        return;
+    }
     const photos = JSON.parse(localStorage.getItem(`event_${currentEventId}_photos`)) || [];
     const photo = photos.find(p => p.id === photoId);
     if (photo) {
@@ -354,10 +389,23 @@ function approvePhoto(photoId) {
     }
 }
 
-// Reject photo
-function rejectPhoto(photoId) {
+// Reject photo (remove aprovação; foto volta para Pendentes)
+async function rejectPhoto(photoId) {
     if (!confirm('Tem certeza que deseja rejeitar esta foto?')) return;
-    
+    const event = events.find(e => e.id === currentEventId);
+    if (event && event.token) {
+        try {
+            const res = await fetch(`/api/photos/${photoId}/approve`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ approved: false })
+            });
+            if (res.ok) await loadEventPhotos(currentEventId);
+        } catch (err) {
+            console.error(err);
+        }
+        return;
+    }
     const photos = JSON.parse(localStorage.getItem(`event_${currentEventId}_photos`)) || [];
     const filteredPhotos = photos.filter(p => p.id !== photoId);
     localStorage.setItem(`event_${currentEventId}_photos`, JSON.stringify(filteredPhotos));
